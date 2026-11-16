@@ -137,3 +137,16 @@ Object.assign(PEOPLE, {
   },
   student98: { pal: { ...PLAYER_PAL, hair: '#241a14', hairHi: '#3e2e22', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
 });
+
+// ── 4장: 지금의 고형석과 정재민 ──
+Object.assign(PEOPLE, {
+  // 동문회장 고형석: 넘긴 머리, 짙은 남색 양복, 금색 넥타이
+  hyungseok: {
+    pal: { ...PLAYER_PAL, hair: '#3a2a1a', hairHi: '#5a4026', blazer: '#1e2440', blazerDk: '#151a30', shirt: '#f4f4f4', tie: '#c8a03a', pants: '#1e2440', pantsDk: '#151a30' },
+  },
+  // 정재민 경위: 짧은 머리, 동그란 안경, 회색 점퍼
+  jaemin: {
+    pal: { ...PLAYER_PAL, hair: '#2a2420', hairHi: '#4a4038', blazer: '#5a5e66', blazerDk: '#464a52', shirt: '#e8e8e8', pants: '#3a3a44', pantsDk: '#2e2e36' },
+    glasses: true, tie: false,
+  },
+});

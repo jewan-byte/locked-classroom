@@ -32,6 +32,81 @@ const EX_COLORS = {
 // init() → 상태, update(m, dt) → 끝나면 { dmg, pages, solved?, once?, miss? }, draw(g, m, ox, oy, t)
 //   miss: 실패한 시도 (정신력이 깎인다)
 const MINIGAMES = {
+  // 최종 반박: 고형석의 변명 네 마디에, 수첩에서 그걸 무너뜨릴 단서를 하나씩 맞춰 낸다
+  rebut: (() => {
+    const W = 282, H = 142;
+    const ROUNDS = [
+      { say: '"쪽지? 그런 건 처음 본다."', ok: ['쪽지 원본'], why: '뒷면에 "— 형석"이라고 직접 써 놓으셨잖아요.' },
+      { say: '"뒷면 글씨가 내 거라는 증거라도 있나?"', ok: ['기념식 방명록'], why: '그저께 이 체육관 방명록에 쓰신 서명과 같은 손이에요.' },
+      { say: '"정재민은 폭력 학생이었어. 기록에 남아 있다."', ok: ['기말고사 감독표', '모순: 감독석의 담임'], why: '그 시각은 3교시 시험 중이었어요. 정재민 씨는 교실에 있었어요.' },
+      { say: '"우리 아버지가 학교 일에 무슨 상관이야?"', ok: ['모순: 그날 저녁의 손님'], why: '그 기록은 운영위원장님, 당신 아버지가 불러 준 대로 쓰인 거예요.' },
+    ];
+    const list = () => CLUES.filter(c => c.found);
+
+    return {
+      init: saved => (saved ? { ...saved, t: 0 } : { round: 0, pick: 0, t: 0, flash: 0 }),
+
+      update(m, dt) {
+        m.t += dt;
+        m.flash = Math.max(0, m.flash - dt);
+        const L = list();
+        const d = (tapped.has('down') ? 1 : 0) - (tapped.has('up') ? 1 : 0);
+        if (d) {
+          m.pick = (m.pick + d + L.length) % L.length;
+          Sound.sfx('move');
+        }
+        if (m.t > 0.3 && tapped.has('interact')) {
+          const R = ROUNDS[m.round], c = L[m.pick];
+          if (!R.ok.includes(c.name)) {
+            return { dmg: 0, miss: true, keep: m, pages: [`「${c.name}」…`, '이걸로는 저 말을 무너뜨릴 수 없다.'] };
+          }
+          Sound.sfx('good');
+          m.flash = 0.5;
+          m.last = R.why;
+          m.round++;
+          m.t = 0;
+          if (m.round < ROUNDS.length) return null;
+          return {
+            dmg: 60, solved: true,
+            pages: [
+              '네 마디의 변명이, 하나씩 무너졌다.',
+              { who: ME, text: '쪽지는 당신 손으로 썼고, 기록은 당신 아버지가 불러 줬어요.' },
+              { who: ME, text: '그리고 정재민 씨는 그걸 바로잡으려다 이 학교에서 쫓겨났어요.' },
+              '고형석의 웃음이 처음으로 굳었다!',
+            ],
+          };
+        }
+        return null;
+      },
+
+      draw(g, m, ox, oy, t) {
+        rect(g, ox, oy, W, H, '#14182a');
+        g.font = WORD_FONT;
+        g.textBaseline = 'middle';
+        const R = ROUNDS[Math.min(m.round, ROUNDS.length - 1)];
+        // 고형석의 말 (말풍선)
+        rect(g, ox + 6, oy + 6, W - 12, 24, '#efe9dc');
+        rect(g, ox + 20, oy + 30, 6, 4, '#efe9dc');
+        g.fillStyle = '#2a2a30';
+        g.fillText(R.say, ox + 12, oy + 18);
+        for (let i = 0; i < ROUNDS.length; i++) rect(g, ox + W - 50 + i * 11, oy + 38, 8, 8, i < m.round ? '#5fdc7a' : '#2a3448');
+        // 단서 목록
+        const L = list(), top = Math.max(0, Math.min(m.pick - 3, L.length - 7));
+        L.slice(top, top + 7).forEach((c, i) => {
+          const sel = top + i === m.pick, y = oy + 44 + i * 12;
+          if (sel) rect(g, ox + 6, y - 6, 200, 12, '#20304c');
+          g.fillStyle = sel ? '#ffe066' : '#8fa6c8';
+          g.fillText((sel ? '▸ ' : '  ') + c.name, ox + 10, y);
+        });
+        if (m.flash > 0 && m.last) {
+          rect(g, ox + 6, oy + H - 20, W - 12, 16, '#203a2c');
+          g.fillStyle = '#c8f0d0';
+          g.fillText(m.last, ox + 10, oy + H - 12);
+        }
+      },
+    };
+  })(),
+
   // 필체 대조: 쪽지 뒷면의 거친 글씨를 두 사람의 글씨와 한 글자씩 비교한다
   //   세 글자(형 · 석 · 줄표 —) 각각, 어느 쪽 글씨와 같은지 A/D 로 고르고 F
   handwriting: (() => {
