@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────
 
 Object.assign(PEOPLE, {
-  // 돌쇠(박건우): 지후의 친구. 짧게 깎은 머리, 체육복 상의(초록) 위에 교복
+  // 건우(박건우): 지후의 친구. 짧게 깎은 머리, 체육복 상의(초록) 위에 교복
   dolsoe: {
     pal: { ...PLAYER_PAL, hair: '#1a1410', hairHi: '#2e241c', blazer: '#2f6a4a', blazerDk: '#24543a', tie: '#2f6a4a', skin: '#e2b98e', skinSh: '#c99a70' },
     tie: false,

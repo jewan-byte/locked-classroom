@@ -66,7 +66,7 @@ const Save = (() => {
       : inStoreroom ? DUST
         : flags.afterSchool ? DUSK : null;
     setFloor(s.floor, { x: s.x / TILE, y: s.y / TILE, dir: s.dir });
-    // 돌쇠는 저장 당시 자리 그대로, 따라오는 길(trail)만 그 자리에서 다시 시작
+    // 건우는 저장 당시 자리 그대로, 따라오는 길(trail)만 그 자리에서 다시 시작
     Object.assign(companion, s.companion);
     trail = [{ x: companion.x, y: companion.y }, { x: player.x, y: player.y }];
     last = JSON.stringify({ ...snapshot(), savedAt: 0 });

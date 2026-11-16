@@ -78,16 +78,15 @@ const CLUE_ART = {
     rect(g, 22, 22, 6, 4, 'rgba(160,120,60,0.35)');
   },
 
-  '책상의 H & W'(g) {
+  '책상의 J & J'(g) {
     rect(g, 0, 0, CLUE_W, CLUE_H, '#c99e68');
     for (let y = 3; y < CLUE_H; y += 6) rect(g, 0, y, CLUE_W, 1, '#b88a55');
     const C = '#5a3a1e';
-    // H
-    rect(g, 8, 9, 2, 10, C); rect(g, 14, 9, 2, 10, C); rect(g, 10, 13, 4, 2, C);
+    const J = x => { rect(g, x, 9, 7, 2, C); rect(g, x + 4, 9, 2, 9, C); rect(g, x, 17, 6, 2, C); rect(g, x, 15, 2, 2, C); };
+    J(7);
     // &
     rect(g, 19, 12, 3, 2, C); rect(g, 18, 14, 2, 4, C); rect(g, 20, 17, 3, 2, C); rect(g, 22, 15, 1, 2, C);
-    // W
-    rect(g, 25, 9, 2, 10, C); rect(g, 31, 9, 2, 10, C); rect(g, 28, 14, 2, 4, C); rect(g, 27, 18, 4, 1, C);
+    J(26);
   },
 
   '파인 사진'(g) {

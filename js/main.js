@@ -65,7 +65,7 @@ let floor = FLOORS.home;
 const player = { x: 0, y: 0, dir: 'down', anim: 0, moving: false, scriptAnim: 0 };
 let cutscene = false;   // 컷신 중엔 움직이거나 조사할 수 없다 (대사 넘기기만 가능)
 
-// 동료(돌쇠): floor 층에 visible 이면 보이고, following 이면 플레이어가 지나간 길을 따라온다
+// 동료(건우): floor 층에 visible 이면 보이고, following 이면 플레이어가 지나간 길을 따라온다
 const companion = { visible: false, following: false, floor: 1, x: 0, y: 0, dir: 'down', anim: 0, moving: false, moveTimer: 0 };
 const COMPANION_GAP = 17;     // 플레이어 뒤로 얼마나(px) 떨어져서 따라오는지 (걸을 땐 조금 더 벌어진다)
 const COMPANION_EASE = 9;     // 클수록 바짝, 작을수록 느긋하게 따라온다
@@ -457,8 +457,8 @@ function pickMenu(id) {
     case 'controls':
       Controls.toggle();
       Menu.show(menuItems(), Controls.mode === 'touch'
-        ? '왼쪽 조이스틱으로 이동, 끝까지 밀면 달리기.\nF 조사 · Q 돌쇠 · ☰ 메뉴 · 수첩 · 지도'
-        : 'WASD 이동 · Shift 달리기 · F 조사\nQ 돌쇠 · Tab 수첩 · M 지도 · Esc 메뉴', 5);
+        ? '왼쪽 조이스틱으로 이동, 끝까지 밀면 달리기.\nF 조사 · Q 건우 · ☰ 메뉴 · 수첩 · 지도'
+        : 'WASD 이동 · Shift 달리기 · F 조사\nQ 건우 · Tab 수첩 · M 지도 · Esc 메뉴', 5);
       break;
     case 'reset':
       Menu.show(
@@ -593,7 +593,7 @@ function update(dt) {
       runScript('friend');
       return;
     }
-    Toast.show(flags.memory ? '돌쇠가 없는 기억 속' : '돌쇠는 지금 곁에 없다.');
+    Toast.show(flags.memory ? '건우가 없는 기억 속' : '건우는 지금 곁에 없다.');
   }
 
   const dx = (keys.has('right') ? 1 : 0) - (keys.has('left') ? 1 : 0);

@@ -10,15 +10,15 @@
 // ─────────────────────────────────────────────
 
 // 주인공: 서지후 (동산고 2학년 6반)
-// 아빠: 서준호 — 동산고 2000년 졸업, 1998년 2학년 6반. 추리 동아리 「221B」의 '왓슨'
-// 동행: 박건우 '돌쇠' — 내기 상대. 입이 가볍고 학교 커뮤니티 '동산 대숲' 단골
+// 아빠: 서준호 — 동산고 2000년 졸업, 1998년 2학년 6반. 추리 동아리 「221B」 부원
+// 동행: 박건우 — 내기 상대. 입이 가볍고 학교 커뮤니티 '동산 대숲' 단골
 const ME = '지후';
-const FRIEND = '돌쇠';
+const FRIEND = '건우';
 
 // 선택에 따라 쌓이는 숨은 값 — 플레이어에겐 보여 주지 않고 엔딩만 가른다
 //   evidence: 밝혀낸 진실
-//   rumor:    돌쇠가 대숲에 글을 올리려는 정도 (높으면 고형석이 먼저 움직인다)
-//   heart:    아빠 / 이수아 선생님 / 정재민(홈즈)이 지후를 믿는 정도
+//   rumor:    건우가 대숲에 글을 올리려는 정도 (높으면 고형석이 먼저 움직인다)
+//   heart:    아빠 / 이수아 선생님 / 정재민이 지후를 믿는 정도
 const route = { evidence: 0, rumor: 0, heart: { dad: 0, suah: 0, jaemin: 0 } };
 const addEvidence = n => { route.evidence += n; };
 const addRumor = n => { route.rumor += n; };
@@ -37,17 +37,17 @@ function resetFlags() {
     askedAlbum: false,   // 아빠에게 앨범에 대해 물어봄
     pushedDad: false,    // 앨범 얘기를 캐물음
     dadStory: false,     // 아빠가 고등학교 때 얘기를 조금 해 줌 ("친구랑 추리소설")
-    betLost: false,      // 돌쇠와의 내기에서 짐 (교실 장면 끝)
+    betLost: false,      // 건우와의 내기에서 짐 (교실 장면 끝)
     // 1장 (월요일 방과 후)
-    afterSchool: false,  // 방과 후, 돌쇠와 함께
-    friendJoined: false, // 돌쇠가 따라다님 (Q)
+    afterSchool: false,  // 방과 후, 건우와 함께
+    friendJoined: false, // 건우가 따라다님 (Q)
     triedDoor: false,    // 창고 자물쇠를 봄
     checkedKeys: false,  // 행정실 열쇠함: 창고 열쇠는 교감 보관
     inRoom: false,       // 화장실 창문 → 난간 → 창고 안
     foundAlbum: false,   // 사물함에서 학급 앨범 (파인 사진, 아빠)
     tookAlbum: false,    // 앨범을 통째로 가져옴 (아니면 사진만 찍음)
     leftRoom: false,     // 창고에서 나옴
-    rumorOk: false,      // 돌쇠에게 대숲 글을 허락함
+    rumorOk: false,      // 건우에게 대숲 글을 허락함
     mondayEvening: false,// 월요일 저녁, 집
     toldDad: false,      // 아빠에게 사진을 보여 줌
     day1Done: false,     // 1장 끝
@@ -60,7 +60,7 @@ function resetFlags() {
 }
 
 // 사물에 붙지 않고 이야기로 얻는 단서 (수첩에는 처음부터 ??? 로 보인다)
-// story: true — 조사로는 못 얻는다. 돌쇠의 "여기 아직 안 본 게 있어" 힌트에서 뺀다
+// story: true — 조사로는 못 얻는다. 건우의 "여기 아직 안 본 게 있어" 힌트에서 뺀다
 function storyClue(name, place, ...text) {
   const c = { name, text, place, found: false, story: true };
   CLUES.push(c);
@@ -112,7 +112,7 @@ const giveClue = (c, msg = `새 단서: ${c.name}  (Tab)`) => {
   Toast.show(msg, clueImage(c.name));
 };
 
-// 방과 후: 노을, 돌쇠가 따라다닌다
+// 방과 후: 노을, 건우가 따라다닌다
 function setupAfterSchool(where = 2, at = { x: 20, y: 30.4, dir: 'up' }) {
   ambient = DUSK;
   actors.length = 0;
@@ -122,7 +122,7 @@ function setupAfterSchool(where = 2, at = { x: 20, y: 30.4, dir: 'up' }) {
   setFloor(where, at);
 }
 
-// 인물(돌쇠 또는 컷신용 NPC)을 (x, y)까지 sec초 동안 걷게 (타일 단위)
+// 인물(건우 또는 컷신용 NPC)을 (x, y)까지 sec초 동안 걷게 (타일 단위)
 async function walkActor(a, x, y, sec) {
   const sx = a.x, sy = a.y, ex = x * TILE, ey = y * TILE;
   const animKey = a === player ? 'scriptAnim' : 'anim';
@@ -161,7 +161,7 @@ async function runScript(name, arg) {
   }
 }
 
-// 왼쪽 위 "지금 하고 있는 일" — 할 일 한 줄 + 돌쇠가 어디 있는지
+// 왼쪽 위 "지금 하고 있는 일" — 할 일 한 줄 + 건우가 어디 있는지
 function statusLines() {
   const lines = [];
   const here = floor.map.n;
@@ -177,7 +177,7 @@ function statusLines() {
   else if (here === 'home') doing = flags.talkedDad ? '현관으로 나가는 중' : '등교 준비 중';
   else if (here === 'bus') doing = '학교 가는 중';
   if (doing) lines.push({ text: doing });
-  if (companion.following) lines.push({ text: '돌쇠와 동행 중', key: 'Q', kind: 'friend' });
+  if (companion.following) lines.push({ text: '건우와 동행 중', key: 'Q', kind: 'friend' });
   return lines;
 }
 
@@ -352,7 +352,7 @@ const SCRIPTS = {
       '8시 10분, 2학년 6반. 조회 전이라 교실이 시끄럽다.',
       { who: FRIEND, text: '서지후! 너 그거 알아? 잠긴 교실 얘기.' },
       { who: ME, text: '…아침부터 또 그거야?' },
-      '박건우. 다들 돌쇠라고 부른다. 힘은 장사인데 겁은 나보다 많다.',
+      '박건우. 덩치는 반에서 제일 큰데 겁은 나보다 많다.',
       { who: FRIEND, text: '어제 대숲에 또 올라왔다니까? 밤에 그 교실에서 누가 중얼거리는 소리가 들렸대.' },
       { who: '은비', text: '그거 야자 끝난 3학년 선배들이 지어낸 거야.' },
       '최은비. 같은 반, 방송부. 미신 얘기만 나오면 팩트 체크를 한다.',
@@ -368,12 +368,12 @@ const SCRIPTS = {
       { who: FRIEND, text: '그러니까! 누가 들어가서 확인을 해 봐야 한다니까?' },
       { who: FRIEND, text: '…지후야. 우리 내기할래? 가위바위보. 진 사람이 방과 후에 들어가서 인증샷 찍어 오기.' },
     );
-    const pick = await choose(['돌쇠가 주먹을 내민다.'], ['가위', '바위', '보']);
+    const pick = await choose(['건우가 주먹을 내민다.'], ['가위', '바위', '보']);
     const mine = ['가위', '바위', '보'][pick];
     const his = ['바위', '보', '가위'][pick];
     await say(
       { who: FRIEND, text: '가위, 바위— 보!' },
-      `나는 ${mine}. 돌쇠는… 한 박자 늦게 ${his}.`,
+      `나는 ${mine}. 건우는… 한 박자 늦게 ${his}.`,
       { who: ME, text: '야, 너 방금 늦게 냈잖아!' },
       { who: FRIEND, text: '안 늦었는데? 은비야, 늦었어?' },
       { who: '은비', text: '…나는 못 봤어.' },
@@ -614,7 +614,7 @@ const SCRIPTS = {
       { who: FRIEND, text: '야, 이거 대숲에 올리면 난리 난다. "잠긴 교실 진짜 들어가 봄 (사진 있음)". 올려도 돼?' },
     );
     // 선택: 대숲 글 — 소문
-    const ok = await choose(['돌쇠가 벌써 휴대폰을 꺼내 들었다.'], ['"…아직 안 돼. 우리 아빠도 나와."', '"…마음대로 해."']) === 1;
+    const ok = await choose(['건우가 벌써 휴대폰을 꺼내 들었다.'], ['"…아직 안 돼. 우리 아빠도 나와."', '"…마음대로 해."']) === 1;
     flags.rumorOk = ok;
     if (ok) {
       addRumor(2);
@@ -721,7 +721,7 @@ const SCRIPTS = {
     await fadeInAsync();
   },
 
-  // ───────── 돌쇠에게 묻기 (Q) ─────────
+  // ───────── 건우에게 묻기 (Q) ─────────
   async friend() {
     let pages;
     if (flags.leftRoom) {
@@ -824,7 +824,7 @@ const DEV_SPOTS = [
 const DEV_STAGES = [
   ['처음부터 (타이틀)', 'title'],
   ['프롤로그 — 2학년 6반 아침 (내기)', 'class'],
-  ['1장 — 방과 후, 돌쇠와', 'after'],
+  ['1장 — 방과 후, 건우와', 'after'],
   ['1장 — 열쇠함 본 뒤 (화장실 창문으로)', 'keys'],
   ['1장 — 창고 안', 'room'],
   ['1장 — 앨범 찾은 뒤 (교감 장면 끝)', 'album'],
