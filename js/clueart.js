@@ -171,7 +171,49 @@ const CLUE_ART = {
     textLines(g, 11, 7, 20, 5, '#2a2a5a');
     rect(g, 26, 22, 3, 3, '#2a2a5a');                    // J
   },
+
+  '기념식 방명록'(g) {
+    rect(g, 0, 0, CLUE_W, CLUE_H, '#2a2230');
+    rect(g, 3, 5, 34, 21, '#f4efe2');
+    rect(g, 19, 5, 1, 21, '#c8c0aa');
+    textLines(g, 6, 9, 11, 3, '#8a847a');
+    for (let i = 0; i < 9; i++) rect(g, 22 + i, 16 - Math.floor(i / 3), 2, 1, '#1a1a1a');   // 비스듬한 서명
+    rect(g, 23, 20, 9, 1, '#1a1a1a');
+    rect(g, 31, 20, 1, 2, '#1a1a1a');                                                   // 꺾인 줄표
+  },
+
+  '아빠의 고백'(g) {
+    rect(g, 0, 0, CLUE_W, CLUE_H, '#1e1a26');
+    rect(g, 9, 4, 22, 22, '#5a4a3a');
+    rect(g, 11, 6, 18, 18, '#e8e0cc');
+    pixelDigit(g, 1, 13, 8, '#5a4a3a');
+    textLines(g, 13, 15, 14, 3, '#6a645a');
+    rect(g, 24, 19, 2, 3, '#6fa8d8');   // 번진 눈물 자국
+  },
+
+  '정재민 경위 기사'(g) {
+    rect(g, 0, 0, CLUE_W, CLUE_H, '#e8e4dc');
+    rect(g, 3, 3, 34, 4, '#2a2a30');
+    rect(g, 4, 10, 13, 15, '#b8b0a0');
+    rect(g, 7, 13, 7, 7, '#e2c098'); rect(g, 7, 12, 7, 2, '#2a2420');
+    rect(g, 7, 15, 3, 1, '#2a2a2a'); rect(g, 11, 15, 3, 1, '#2a2a2a');   // 동그란 안경
+    rect(g, 6, 20, 9, 5, '#2a3a5a');
+    textLines(g, 20, 11, 15, 5, '#6a645a');
+  },
 };
+
+// 모순 단서: 금 간 사진 (기억이 어긋난 곳)
+for (const name of ['모순: 친절한 부탁', '모순: 창밖을 보던 감독', '모순: 감독석의 담임', '모순: 그날 저녁의 손님']) {
+  CLUE_ART[name] = g => {
+    rect(g, 0, 0, CLUE_W, CLUE_H, '#2a2230');
+    rect(g, 6, 4, 28, 22, '#c8a878');
+    rect(g, 8, 6, 24, 18, '#8a6a4a');
+    const seed = name.length;
+    for (let i = 0; i < 18; i++) rect(g, 18 + Math.round(Math.sin(i * 0.9 + seed) * 3), 6 + i, 2, 1, '#f4efe2');   // 금
+    rect(g, 11, 12, 4, 5, '#5a4030');
+    rect(g, 25, 11, 4, 6, '#5a4030');
+  };
+}
 
 // 단서 이름 → 일러스트 캔버스 (한 번만 그려서 재사용)
 const clueImageCache = {};

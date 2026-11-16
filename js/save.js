@@ -68,6 +68,13 @@ const Save = (() => {
     trail = [{ x: companion.x, y: companion.y }, { x: player.x, y: player.y }];
     // 수요일 점심: 방송실에서 기다리는 은비
     if (flags.toBroadcast && !flags.heardTape) addActor('eunbi', 57.5, 9.2, 'down', 1);
+    // 3장: 기억 속이면 그 사람의 모습과 기억 속 인물들, 아니면 교무실의 이수아 선생님
+    if (flags.memory) {
+      setPlayerLook(MEMORY_LOOK[flags.memory]);
+      addMemoryActors();
+    } else if (flags.suahClass && !flags.thuEvening) {
+      addActor('suah', 57.5, 25.4, 'down', 1);
+    }
     last = JSON.stringify({ ...snapshot(), savedAt: 0 });
   }
 

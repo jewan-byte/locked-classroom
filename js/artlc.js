@@ -111,3 +111,29 @@ PEOPLE.dj98 = {
   pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3020', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' },
   glasses: true,
 };
+
+// ── 3장: 이수아 선생님과 1998년의 사람들 ──
+Object.assign(PEOPLE, {
+  // 이수아 선생님 (국어): 긴 머리를 묶었다, 베이지 카디건
+  suah: {
+    pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#c8b48e', blazerDk: '#a8946e', shirt: '#f4f0e8', pants: '#4a4a56', pantsDk: '#3a3a44' },
+    tie: false,
+  },
+  // 1998년 교복: 진남색 재킷, 붉은 넥타이
+  suah98: { pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
+  jaemin98: { pal: { ...PLAYER_PAL, hair: '#1a1410', hairHi: '#3a2c20', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' }, glasses: true },
+  junho98: { pal: { ...PLAYER_PAL, hair: '#3a2a24', hairHi: '#5b4236', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
+  // 고형석 (1998): 재킷을 풀어 헤치고 넥타이 없이, 갈색 물들인 머리
+  hyungseok98: { pal: { ...PLAYER_PAL, hair: '#7a4a24', hairHi: '#9a6434', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#f4f4f4' }, tie: false },
+  gang98: { pal: { ...PLAYER_PAL, hair: '#141014', hairHi: '#2a2228', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#e8e8e8' }, tie: false },
+  // 문병철 (1998, 담임): 검은 머리, 회색 양복, 안경
+  gyogam98: {
+    pal: { ...PLAYER_PAL, hair: '#1a1a1e', hairHi: '#33333a', blazer: '#55585f', blazerDk: '#43464c', shirt: '#f0f0f0', tie: '#3a4a6a', pants: '#43464c', pantsDk: '#36383e' },
+    glasses: true,
+  },
+  // 학교운영위원장 (고형석의 아버지): 짙은 양복, 금색 넥타이
+  chairman98: {
+    pal: { ...PLAYER_PAL, hair: '#2a2a2a', hairHi: '#444', blazer: '#1e1e26', blazerDk: '#141418', shirt: '#f0f0f0', tie: '#c8a03a', pants: '#1e1e26', pantsDk: '#141418' },
+  },
+  student98: { pal: { ...PLAYER_PAL, hair: '#241a14', hairHi: '#3e2e22', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
+});

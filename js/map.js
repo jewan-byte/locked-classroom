@@ -192,6 +192,8 @@ function build1F() {
   b.obj('plant', 54, 22);
   b.obj('cabinet', 60, 22, 2, 1, look('서류함. "학생 생활 기록 — 열람 시 교감 결재"'));
   for (const [tx, ty] of [[55, 24], [59, 24], [55, 27], [59, 27]]) b.obj('tdesk', tx, ty, 2, 2);
+  // 3장: 교무실에 들어서면 이수아 선생님 장면 (story.js 의 office3)
+  b.warps.push({ x: 54, y: 22, w: 8, h: 9, script: 'office3' });
 
   // 건물 남쪽 외벽 + 현관 통로
   b.carve(1, 32, 62, 3, 'wall');
@@ -243,6 +245,7 @@ function build1F() {
   b.obj('gymmat', 91, 50, 2, 1);
   b.dec('banner', 77, 36, 6, 2, look('현수막. "개교 52주년 기념식 — 자랑스러운 동산인"'));
   b.obj('stage', 76, 40, 8, 2);
+  b.obj('podium', 73, 42, 2, 1, { script: 'guestbook', prompt: '방명록 보기' });   // 기념식 방명록 (3장: 고형석의 글씨)
   b.obj('trophycase', 86, 41, 3, 1, look('기념식 때 쓸 감사패들이 진열돼 있다.', '맨 앞 감사패. "고형석 동문회장님 — 모교 발전 기금 5억 원"'));
 
   return finishFloor(b);
@@ -462,7 +465,7 @@ function buildHome() {
       '…이상하다. 다른 사람들은 친구랑 찍은 사진이 많은데, 아빠는 전부 혼자 찍혀 있다.'),
     flag: 'sawAlbum',
   });
-  b.obj('bag', 29, 14, 1, 1, look('아빠의 검은 가방. 회사 서류가 들어 있겠지.'));
+  b.obj('bag', 29, 14, 1, 1, { script: 'dadBag', prompt: '조사하기' });   // 3장 목요일 밤: 아빠의 일기
   b.obj('plant', 14, 15);
 
   // 현관 (아래로 나가면 등교)
@@ -497,8 +500,44 @@ function buildBus() {
   return finishFloor(b);
 }
 
+// ── 1998년 2층 (기억 속): 지금의 창고가 아직 2학년 6반이던 때 ──
+function buildPast2F() {
+  const b = createFloor('p2', 66, 34, { label: '1998년 · 2층' });
+  b.room('2층 복도', 2, 16, 60, 4, 'hall');
+  b.obj('lockers', 3, 16, 8, 1);
+  b.obj('lockers', 19, 16, 8, 1);
+  b.obj('lockers', 35, 16, 8, 1, look('철제 사물함. 누군가 발로 찬 자국이 움푹 패어 있다.'));
+  b.dec('bulletin', 14, 15, 4, 1, look('"기말고사 기간 — 복도에서 떠들지 말 것"'));
+  b.dec('bulletin', 48, 15, 4, 1, look('"제12회 동산 독서 퀴즈 — 1등 2학년 6반 이수아"'));
+  b.obj('plant', 61, 16);
+  b.obj('plant', 2, 16);
+  topClassroom(b, '2학년 1반', 2);
+  topClassroom(b, '2학년 2반', 18);
+  topClassroom(b, '2학년 3반', 34);
+  topClassroom(b, '2학년 4반', 50, 12);
+
+  // 2학년 6반 (1998)
+  b.room('2학년 6반', 40, 22, 14, 9, 'wood');
+  b.carve(50, 20, 2, 2, 'door');
+  b.dec('blackboard', 41, 21, 6, 1, look('칠판. "2학기 기말고사 둘째 날 — 2교시 국어, 3교시 수학"', '오른쪽 구석에 작게, 유성 매직으로. "221B"'));
+  b.dec('chart', 47, 21, 2, 1, look('감독 배정표. 2교시도 3교시도 "담임 문병철".'));
+  b.dec('calendar', 49, 21, 1, 1, look('1998년 12월 달력. 아직 아무 표시도 없다.'));
+  // 이수아의 기억: 복도로 나서면 고형석 패거리 (story.js 의 suahHall)
+  b.warps.push({ x: 2, y: 16, w: 60, h: 4, script: 'suahHall', once: 'shHall' });
+  b.dec('window', 52, 20, 2, 2);
+  b.obj('podium', 46, 22, 2, 1);
+  for (const cx of [41, 43, 45, 47, 49, 51]) {
+    for (const cy of [23, 25, 27]) {
+      const d = b.obj('desk', cx, cy, 1, 2);
+      if (cx === 45 && cy === 25) Object.assign(d, { script: 'suahDesk', prompt: '내 자리' });
+    }
+  }
+  b.obj('oldlocker', 43, 30, 6, 1, look('반 사물함. 아직 번호표가 새것이다.'));
+  return finishFloor(b);
+}
+
 function buildWorld() {
-  return { home: buildHome(), bus: buildBus(), 1: build1F(), 2: build2F(), 3: build3F() };
+  return { home: buildHome(), bus: buildBus(), 1: build1F(), 2: build2F(), 3: build3F(), p2: buildPast2F() };
 }
 
 // 바닥·벽·장식을 한 장의 큰 캔버스에 미리 그려둔다

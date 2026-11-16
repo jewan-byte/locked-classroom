@@ -67,6 +67,26 @@ function resetFlags() {
     leftRoom2: false,    // 두 번째로 창고에서 나옴
     rumorNote: false,    // 쪽지 얘기까지 대숲에 올려도 된다고 함
     ch2Done: false,      // 2장 끝
+    // 3장 「1998년의 시험」 — 11월 19일 목요일
+    ch3: false,          // 목요일 1교시 국어
+    memory: null,        // 지금 누구의 기억 속인지 ('suah' | 'gyogam'), 현실이면 null
+    suahClass: false,    // 국어 시간: 판서의 ③ 꼬리 = 쪽지 글씨
+    suahMet: false,      // 교무실: 쪽지를 보여 줌 → 이수아의 기억
+    shHall: false,       // 기억 속: 복도의 고형석 패거리 (부탁 → 협박으로 뒤집힘)
+    shExam: false,       // 기억 속: 2교시 국어, 쪽지, 재민의 눈, 창밖을 보던 감독
+    suahMemDone: false,  // 기억에서 돌아옴 (모순 2개)
+    gotGuestbook: false, // 체육관 방명록: 고형석의 서명
+    suahWon: false,      // 필체 대조 승리
+    suahTestify: false,  // 이수아 선생님이 금요일에 직접 말하겠다고 함
+    gyogamWon: false,    // 교감의 기억 + 감독표 대조 승리
+    thuEvening: false,   // 목요일 저녁, 집
+    dadRefused: false,   // 아빠가 말을 피함 (마음이 낮을 때)
+    readDiary: false,    // 아빠 가방 속 일기를 몰래 읽음
+    dadConfessed: false, // 아빠의 고백 (1998년 12월)
+    dadComes: false,     // 아빠가 내일 기념식에 온다
+    calledJaemin: false, // 해원경찰서 정재민 경위와 통화
+    jaeminMaybe: false,  // 재민이 "기억해 둘게" (올 수도 있다)
+    ch3Done: false,      // 3장 끝
   });
   companion.visible = false;
   companion.following = false;
@@ -114,8 +134,151 @@ const MEMO_CLUE = storyClue('재민의 메모', '2층 · 창고',
   '"담임 선생님께 말씀드렸지만 덮였다."',
   '"준호야, 이걸 찾았다면— 미안하다. 그리고 부탁한다. — J"');
 
+// 3장 단서
+const CONTRA_SH_THREAT = storyClue('모순: 친절한 부탁', '3장 · 이수아의 기억',
+  '수아 선생님의 기억 속 형석은 "좀 도와주라"고 웃으며 부탁했다.',
+  '…하지만 기억이 뒤집혔을 때, 형석은 사물함을 차며 "안 하면 알지?"라고 했다.');
+const CONTRA_SH_WINDOW = storyClue('모순: 창밖을 보던 감독', '3장 · 이수아의 기억',
+  '2교시 국어 시험 내내, 감독 문병철 선생님은 창밖만 보고 있었다.',
+  '맨 뒷자리의 재민도 본 쪽지를, 감독만 못 봤다.');
+const GUEST_CLUE = storyClue('기념식 방명록', '1층 · 체육관',
+  '"모교의 무궁한 발전을 기원합니다. — 동문회장 고형석"',
+  '비스듬히 누운 획. 갈고리처럼 꺾인 줄표.');
+const CONTRA_GG_SEAT = storyClue('모순: 감독석의 담임', '3장 · 문병철의 기억',
+  '기록은 "10시 55분, 2층 복도". 그 시각 문병철은 2학년 6반 감독석에 있었다.',
+  '정재민은 맨 뒷자리에서 시험을 보고 있었다.');
+const CONTRA_GG_GUEST = storyClue('모순: 그날 저녁의 손님', '3장 · 문병철의 기억',
+  '그날 저녁, 빈 교실에 학교운영위원장(고형석의 아버지)이 찾아왔다.',
+  '"기록은 이렇게 쓰시죠, 선생님."');
+const DAD_CLUE = storyClue('아빠의 고백', '집 · 거실',
+  '1998년 12월, 아빠는 담임 앞에서 "아무것도 못 봤어요"라고 했다.',
+  '사연의 첫 글자를 알아챘지만, 앨범을 열지 않았다. 재민의 전화도 받지 않았다.');
+const NEWS_CLUE = storyClue('정재민 경위 기사', '집 · 내 방',
+  '"해원고 출신 정재민 경위, 10년 추적 끝에 보이스피싱 조직 검거" (2024년 지역 신문)',
+  '"증거 없이는 말하지 않는다. 학창 시절 동아리 규칙이었죠."');
+
 // ── 추리 대결 (experiment.js 의 '추리 노트' 화면) — 주장마다 대사와 단서 반응 ──
 const EXPERIMENTS = {
+  // 3장 목요일, 교무실 — 이수아 선생님의 28년 된 자책
+  handwriting: {
+    title: '필체 대조',
+    mini: 'handwriting',
+    miniHelp: 'A/D 견본 바꾸기 · F 같은 글씨',
+    portrait: 'suah98',
+    prop: 'paper',
+    speaker: '기억 속 수아',
+    claim: '"형석이는 시킨 적 없어. 내가 먼저 보여 줬어."',
+    source: '— 이수아 (1998년 2학년 6반)',
+    intro: [
+      '기억 속 열일곱 살의 수아가 쪽지를 꼭 쥐고 있다.',
+      '28년 동안, 이 아이는 모든 게 자기 탓이라고 말해 왔다.',
+    ],
+    observe: [
+      ['주장을 다시 듣는다.', '"내가 먼저 보여 줬어. 형석이는 부탁만 했어."'],
+      ['쪽지는 두 면이다. 앞면엔 답, 뒷면엔 "다음 시간도 똑같이. 안 하면 알지?"', '앞면은 수아의 글씨다. 그럼 뒷면은?'],
+      ['뒷면 글씨가 누구 것인지 증명하려면… 고형석의 글씨 견본이 필요하다. ([단서 제시])'],
+    ],
+    clues: {
+      '기념식 방명록': {
+        dmg: 15, unlock: true,
+        text: [
+          '방명록 사진을 꺼냈다.',
+          { who: ME, text: '어제 고형석 회장이 체육관 방명록에 쓴 서명이에요. 비스듬한 획, 꺾인 줄표.' },
+          '비교할 견본을 손에 넣었다. 이제 [추리]로 직접 맞춰 볼 수 있다!',
+        ],
+      },
+      '쪽지 원본': {
+        dmg: 15,
+        text: [{ who: ME, text: '"안 하면 알지?" 이건 부탁이 아니에요. 협박이에요.' }, '수아가 쪽지를 뒤집어 쥐었다.'],
+      },
+      '재민의 메모': {
+        dmg: 15,
+        text: [{ who: ME, text: '"수아는 협박당하고 있다." 재민 씨는 그때 이미 알고 있었어요.' }],
+      },
+      '모순: 친절한 부탁': {
+        dmg: 15,
+        text: [{ who: ME, text: '선생님 기억 속에서도, 형석은 부탁하지 않았어요. 사물함을 찼어요.' }, '"…그건." 수아의 목소리가 갈라졌다.'],
+      },
+      '모순: 창밖을 보던 감독': {
+        dmg: 5,
+        text: [{ who: ME, text: '감독 선생님도 일부러 안 본 거예요. 혼자 막을 수 있는 일이 아니었어요.' }],
+      },
+    },
+    wrongClue: name => [`「${name}」을(를) 내밀었다.`, '…이 주장과는 관계가 없다.'],
+    noTarget: ['무엇과 비교해야 할지 모르겠다.', '고형석의 글씨 견본이 있다면… ([단서 제시])'],
+    expDone: ['이미 확인했다. 뒷면은 고형석의 글씨다.'],
+    notYet: ['아직 근거가 부족하다.', '성급했다. 수아는 아직 자기 탓이라고 믿고 있다.'],
+    broken: ['"내가 먼저"의 신뢰도가 바닥났다.', '지금이라면… [반박]할 수 있다!'],
+    taunts: ['내가 쓴 거야. 내 글씨잖아.', '형석이는 부탁만 했어. 거절 못 한 건 나야.', '다 내 잘못이야. 그러니까 이제 그만해.'],
+    tauntsWeak: ['…그 애 발소리가 아직도 들려.', '무서웠어. …무서웠다고 말하면, 뭐가 달라져?'],
+    win: [
+      { who: ME, text: '선생님은 먼저 보여 준 게 아니에요. 협박당한 거예요. 쪽지 뒷면이 그 증거예요.' },
+      { who: ME, text: '28년 동안 선생님이 지고 있던 건, 선생님 잘못이 아니었어요.' },
+      '기억 속 수아가 쪽지를 놓았다. 손이 더는 떨리지 않았다.',
+      '「내가 먼저 보여 줬어」를 반박했다!',
+    ],
+  },
+
+  // 3장 목요일, 교무실 — 문병철 교감의 생활기록부
+  timetable: {
+    title: '감독표 대조',
+    mini: 'timetable',
+    miniHelp: '방향키 칸 고르기 · F 확정',
+    portrait: 'gyogam98',
+    prop: 'paper',
+    speaker: '기억 속 문병철',
+    claim: '"정재민이 고형석을 때렸다. 내가 직접 봤다."',
+    source: '— 생활기록부 1998.12.15 (담임 문병철)',
+    intro: [
+      '기억 속 젊은 문병철이 생활기록부를 펼쳐 든다.',
+      '"10시 55분, 2층 복도." 28년 동안 아무도 의심하지 않은 한 줄.',
+    ],
+    observe: [
+      ['기록을 다시 읽는다.', '"1998년 12월 15일 10시 55분, 2층 복도에서 정재민이 고형석을 폭행. 담임 직접 목격."'],
+      ['12월 15일은 기말고사 둘째 날이다.', '시험 날 그 시각에, 모두 어디 있었을까?'],
+      ['시험 시간표와 감독 배정이 적힌 표가 있다면… ([단서 제시])'],
+    ],
+    clues: {
+      '기말고사 감독표': {
+        dmg: 15, unlock: true,
+        text: [
+          '감독표를 펼쳤다. "1998학년도 2학기 기말고사 — 2학년 6반"',
+          { who: ME, text: '시험 시간표와 감독 배정이 다 적혀 있어요. 선생님 이름도요.' },
+          '기록의 시각을 맞춰 볼 수 있다. [추리]로 직접 확인하자!',
+        ],
+      },
+      '모순: 감독석의 담임': {
+        dmg: 15,
+        text: [{ who: ME, text: '선생님 기억 속에서도, 그 시각 선생님은 감독석에 앉아 계셨어요.' }, '젊은 문병철이 눈을 피했다.'],
+      },
+      '모순: 그날 저녁의 손님': {
+        dmg: 15,
+        text: [{ who: ME, text: '"기록은 이렇게 쓰시죠, 선생님." 그날 저녁, 누가 그 말을 했죠?' }],
+      },
+      '재민의 메모': {
+        dmg: 10,
+        text: [{ who: ME, text: '"담임 선생님께 말씀드렸지만 덮였다." 정재민 씨는 선생님한테 먼저 갔어요.' }],
+      },
+      '동창들의 답장': {
+        dmg: 5,
+        text: [{ who: ME, text: '"그 뒤로 걔 얘기 하면 안 되는 분위기였어요." 그 분위기, 누가 만든 거예요?' }],
+      },
+    },
+    wrongClue: name => [`「${name}」을(를) 내밀었다.`, '…이 기록과는 관계가 없다.'],
+    noTarget: ['무엇과 맞춰 봐야 할지 모르겠다.', '그날의 시험 시간표가 있다면… ([단서 제시])'],
+    expDone: ['이미 확인했다. 10시 55분은 3교시 시험 중이었다.'],
+    notYet: ['아직 근거가 부족하다.', '성급했다. 기록은 아직 굳건하다.'],
+    broken: ['"내가 직접 봤다"의 신뢰도가 바닥났다.', '지금이라면… [반박]할 수 있다!'],
+    taunts: ['내가 담임이었다. 내 눈으로 봤어.', '기록은 기록이다. 28년간 아무도 문제 삼지 않았어.', '학생이 교사의 기록을 의심하는 건가?'],
+    tauntsWeak: ['…10시 55분. 그래, 그때는…', '복도였어. 복도였을 거야…'],
+    win: [
+      { who: ME, text: '10시 55분, 선생님은 교실 감독석에 계셨어요. 정재민 씨는 시험을 보고 있었고요.' },
+      { who: ME, text: '그 기록은 본 걸 쓴 게 아니라, 받아 적은 거예요. 그날 저녁 찾아온 사람이 불러 주는 대로.' },
+      '젊은 문병철의 손에서 생활기록부가 떨어졌다.',
+      '「내가 직접 봤다」를 반박했다!',
+    ],
+  },
+
   // 2장 수요일, 방송실 — 1998년 12월 16일 점심 방송의 사연
   acrostic: {
     title: '사연 해독',
@@ -197,8 +360,49 @@ const EXPERIMENTS = {
   },
 };
 
+// 기억 속 (1998년): 빛바랜 사진 색
+const PAST = ['rgba(200,160,90,0.20)', 'rgba(30,24,40,0.10)'];
+const MEMORY_LOOK = { suah: 'suah98', gyogam: 'gyogam98' };
+
+// 누군가의 기억으로: 건우·현재 인물은 사라지고, 지후는 그 사람이 된다
+function beginMemory(who, where, at) {
+  ambient = PAST;
+  actors.length = 0;
+  companion.following = false;
+  companion.visible = false;
+  flags.memory = who;
+  setPlayerLook(MEMORY_LOOK[who]);
+  setFloor(where, at);
+  addMemoryActors();
+}
+
+// 기억 속에 처음부터 있는 사람들
+function addMemoryActors() {
+  if (flags.memory !== 'suah') return;
+  for (const [x, y] of [[42, 24.2], [44, 26.2], [48, 24.2], [50, 28.2], [42, 28.2]]) addActor('student98', x, y, 'up', 'p2');
+  addActor('junho98', 52.5, 26.2, 'left', 'p2');
+  addActor('jaemin98', 52.5, 28.2, 'left', 'p2');
+  if (!flags.shHall) {
+    addActor('hyungseok98', 47.5, 17.4, 'down', 'p2');
+    addActor('gang98', 46.2, 17.9, 'right', 'p2');
+    addActor('gang98', 48.8, 17.9, 'left', 'p2');
+  } else {
+    addActor('hyungseok98', 44, 28.2, 'up', 'p2');
+  }
+}
+
+// 기억에서 현재로
+function endMemory() {
+  flags.memory = null;
+  actors.length = 0;
+  setPlayerLook(null);
+  ambient = sceneAmbient();
+}
+
 // 장면마다 화면 색 (저장을 불러올 때도 쓴다)
 function sceneAmbient() {
+  if (flags.memory) return PAST;
+  if (flags.ch3) return flags.thuEvening ? EVENING : null;
   if (flags.ch2) {
     if (flags.inRoom2 && !flags.leftRoom2) return DUST;
     if (flags.roomAgain && !flags.ch2Done) return DUSK;
@@ -306,7 +510,13 @@ function statusLines() {
   const lines = [];
   const here = floor.map.n;
   let doing = null;
-  if (flags.ch2Done) doing = '3장 「1998년의 시험」 — 만드는 중';
+  if (flags.memory === 'suah') {
+    return [{ text: '이수아의 기억 — 1998년 12월 15일' }, { text: flags.shHall ? '2교시 시작 — 내 자리로' : '쉬는 시간 — 복도 정수기에 다녀오자' }];
+  }
+  if (flags.memory) return [{ text: '1998년 — 기억 속' }];
+  if (flags.ch3Done) doing = '4장 「다시 열린 교실」 — 만드는 중';
+  else if (flags.ch3) doing = ch3Doing();
+  else if (flags.ch2Done) doing = '3장 「1998년의 시험」 — 만드는 중';
   else if (flags.ch2) doing = ch2Doing();
   else if (flags.mondayEvening) doing = '저녁 — 아빠한테 물어볼까';
   else if (flags.leftRoom) doing = '오늘은 집으로 (1층 현관)';
@@ -320,6 +530,18 @@ function statusLines() {
   if (doing) lines.push({ text: doing });
   if (companion.following) lines.push({ text: '건우와 동행 중', key: 'Q', kind: 'friend' });
   return lines;
+}
+
+// 3장에서 지금 할 일
+function ch3Doing() {
+  if (flags.calledJaemin) return '…내일은 기념식';
+  if (flags.dadConfessed) return '내 방 책상 — 해원고 정재민 찾아보기';
+  if (flags.dadRefused && !flags.readDiary) return '아빠는 방으로 들어갔다… 거실 구석의 검은 가방';
+  if (flags.thuEvening) return '저녁 — 아빠와 이야기하기';
+  if (flags.gotGuestbook && !flags.suahWon) return '1층 교무실 — 수아 선생님께 필체 대조';
+  if (flags.suahMemDone) return '체육관 — 기념식 방명록 (고형석의 글씨)';
+  if (flags.suahClass) return '1층 교무실 — 이수아 선생님 찾아가기';
+  return '1교시 국어';
 }
 
 // 2장에서 지금 할 일
@@ -390,6 +612,7 @@ const SCRIPTS = {
 
   // 아빠 (식탁)
   async dad() {
+    if (flags.ch3) return SCRIPTS.dadThu();
     if (flags.ch2) return SCRIPTS.dadTue();
     if (flags.mondayEvening) return SCRIPTS.dadEvening();
     if (!flags.talkedDad) {
@@ -1040,6 +1263,12 @@ const SCRIPTS = {
 
   // 내 방 책상 (화요일 밤: 동창 밴드)
   async myDesk() {
+    if (flags.ch3) {
+      if (flags.thuEvening && flags.dadConfessed && !flags.calledJaemin) return SCRIPTS.callJaemin();
+      if (flags.thuEvening && !flags.dadConfessed) await say('…먼저 아빠와 이야기해야 한다.');
+      else await say('책상 위에 수학 학습지가 펼쳐져 있다.');
+      return;
+    }
     if (!flags.tueEvening || flags.wed) {
       await say('책상 위에 수학 학습지가 펼쳐져 있다.', '…주말 내내 한 문제도 안 풀었다.');
       return;
@@ -1297,14 +1526,496 @@ const SCRIPTS = {
     await fadeBlack();
     actors.length = 0;
     await showChapter('2장 「사라진 얼굴」 끝', 2.4);
-    await showChapter('3장 「1998년의 시험」\n— 만드는 중 —', 2.6);
+    await SCRIPTS.ch3Start();
+  },
+
+  // ───────── 3장 「1998년의 시험」 ─────────
+
+  // 목요일 1교시 국어 — 판서의 ③
+  async ch3Start() {
+    await showChapter('3장\n1998년의 시험', 2.4);
+    await showChapter('11월 19일 목요일\n1교시 국어', 2.2);
+    flags.ch3 = true;
     setupDay(2, CLASS_SEAT);
+    const t = addActor('suah', 20.5, 23.6, 'down', 2);
+    addActor('student1', 18.5, 24.2 + 2, 'up', 2);
+    addActor('eunbi', 21.5, 28.2, 'up', 2);
+    addActor('student3', 25.5, 24.2, 'up', 2);
+    await fadeInAsync();
+    await say(
+      '1교시, 국어. 이수아 선생님이 교탁 앞에 섰다.',
+      flags.rumorNote
+        ? '교실이 수군거린다. 어젯밤 대숲에 올라간 쪽지 사진 때문이다. 이름은 가렸지만… 선생님 얼굴이 하얗다.'
+        : '평소와 똑같은 목소리. 평소와 똑같은 미소.',
+      { who: '이수아 선생님', text: '자, 기말 대비 문제. 답 번호만 칠판에 적을게.' },
+      '선생님이 칠판에 번호를 적는다. "1.③ 2.① 3.④"',
+      '…③의 꼬리가 동그랗게 말려 올라간다.',
+      '가방 속 쪽지를 책상 밑에서 펼쳤다. "국어 — 1.③ 2.①…"',
+      '똑같다. 꼬리를 마는 버릇까지.',
+      { who: FRIEND, text: '(…지후야.)' },
+      { who: ME, text: '(…응. 선생님 글씨야.)' },
+    );
+    Sound.sfx('chime');
+    await say('딩동댕동—', { who: '이수아 선생님', text: '오늘은 여기까지. 질문 있으면 쉬는 시간에 교무실로 와.' });
+    await walkActor(t, 24.5, 22.5, 0.9);
+    await walkActor(t, 24.5, 20.5, 0.5);
+    actors.length = 0;
+    flags.suahClass = true;
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    // 1장에서 감독표를 못 봤어도 3장 대결에 쓸 수 있게: 건우가 찍어 둔 사진
+    const chart = CLUES.find(c => c.name === '기말고사 감독표');
+    if (!chart.found) {
+      await say(
+        { who: FRIEND, text: '아 맞다. 월요일에 창고 벽에 붙어 있던 표, 나 사진 찍어 놨어. 인증샷 겸.' },
+        { who: FRIEND, text: '기말고사 감독표였던 것 같은데. 보내 줄게.' },
+      );
+      giveClue(chart);
+    }
+    await say({ who: FRIEND, text: '…교무실 가자. 1층 오른쪽 끝.' });
+  },
+
+  // 1층 교무실에 들어서면 (3장)
+  async office3() {
+    if (!flags.ch3 || flags.memory || flags.thuEvening) return;
+    if (flags.suahClass && !flags.suahMet) return SCRIPTS.suahScene();
+    if (flags.gotGuestbook && flags.suahMemDone && !flags.suahWon) return SCRIPTS.suahFight();
+  },
+
+  // 교무실: 쪽지를 내민다 → 이수아의 기억
+  async suahScene() {
+    flags.suahMet = true;
+    await say(
+      '이수아 선생님이 창가 자리에서 수행평가지를 넘기고 있다.',
+      { who: '이수아 선생님', text: '지후랑 건우네. 질문?' },
+      { who: ME, text: '…선생님. 이거, 선생님 글씨 맞죠?' },
+      '쪽지를 책상 위에 내려놓았다.',
+      '선생님의 손이 멈췄다. 빨간 펜이 수행평가지 위로 굴러떨어졌다.',
+      { who: '이수아 선생님', text: '……이걸, 어디서.' },
+      { who: ME, text: '2층 창고. 1998년 2학년 6반 앨범 속, 정재민 씨 사진 뒤에서요.' },
+      { who: '이수아 선생님', text: '재민이가… 그걸, 거기에.' },
+      '선생님은 한참 쪽지를 내려다봤다.',
+      { who: '이수아 선생님', text: '…맞아. 내 글씨야. 내가 형석이한테 답을 보여 줬어.' },
+      { who: '이수아 선생님', text: '내가 먼저. 내가 약해서.' },
+      { who: FRIEND, text: '협박당하신 거 아니에요? 메모에는—' },
+      { who: '이수아 선생님', text: '아니야. …그날 얘기, 해 줄까. 그럼 알 거야. 다 내 탓이라는 거.' },
+    );
+    startGlitch(1.2);
+    await fadeBlack();
+    await showChapter('1998년 12월 15일 화요일\n2교시 직전, 쉬는 시간', 2.4);
+    beginMemory('suah', 'p2', { x: 46, y: 29.4, dir: 'up' });
+    await fadeInAsync();
+    startGlitch(0.6);
+    await say(
+      '…나는 이수아. 열일곱 살. 2학년 6반.',
+      '기말고사 둘째 날. 다음은 국어. 제일 자신 있는 과목이다.',
+      '쉬는 시간. 교실엔 문제집 넘기는 소리뿐이다.',
+      '…목이 마르다. 복도 정수기에 다녀오자.',
+    );
+  },
+
+  // 기억 속: 복도의 고형석 패거리 — 부탁이 협박으로 뒤집힌다
+  async suahHall() {
+    if (flags.memory !== 'suah' || flags.shHall) return;
+    flags.shHall = true;
+    await say('복도에 나서자마자, 사물함 앞에 형석이 패거리가 있었다.', { who: '고형석', text: '어, 수아야. 마침 잘 왔다.' });
+    await say(
+      '형석이가 웃으면서 다가왔다.',
+      { who: '고형석', text: '이번 국어 말이야. 나 진짜 망하면 아빠한테 죽거든. 좀 도와주라. 응?' },
+      { who: '이수아', text: '…응. 알았어. 답, 보여 줄게.' },
+      '…그래. 그렇게 된 거였다. 형석이는 부탁했고, 나는 그러겠다고 했다. 내가 먼저—',
+    );
+    startGlitch(1.0);
+    await wait(0.3);
+    Sound.sfx('hit');
+    await say(
+      '쾅!',
+      '형석이가 내 옆 사물함을 발로 찼다.',
+      { who: '고형석', text: '다음 시간. 답 써서 책상 밑으로 넘겨.' },
+      { who: '고형석', text: '안 하면 알지? 너희 엄마 가게, 시장 입구 맞지? 우리 매일 놀러 간다?' },
+      '패거리가 낄낄 웃었다. 다리가 떨려서 서 있을 수가 없었다.',
+    );
+    startGlitch(0.8);
+    await say({ who: '이수아', text: '…아니야. 내가 그러겠다고 한 거야. 내가.' });
+    for (const a of actors.filter(a => a.who === 'hyungseok98' || a.who === 'gang98')) removeActor(a);
+    addActor('hyungseok98', 44, 28.2, 'up', 'p2');
+    Sound.sfx('chime');
+    await say('딩동댕동— 2교시 시작종.', '…자리로 돌아가야 한다.');
+  },
+
+  // 기억 속: 내 자리 — 2교시 국어
+  async suahDesk() {
+    if (flags.memory !== 'suah' || flags.shExam) return;
+    if (!flags.shHall) {
+      await say('내 자리. 국어 문제집이 펼쳐져 있다.', '…시험 전에 물 한 잔만 마시고 오자.');
+      return;
+    }
+    flags.shExam = true;
+    player.x = 44.5 * TILE;
+    player.y = 26.4 * TILE;
+    player.dir = 'up';
+    addActor('gyogam98', 47, 21.9, 'down', 'p2');
+    await say(
+      '2교시, 국어. 감독은 담임 문병철 선생님.',
+      { who: '문병철 선생님', text: '시작.' },
+      '…문제가 하나도 눈에 안 들어온다. 그래도 손은 답을 쓴다. 다 아는 문제다.',
+      '답을 다 쓰고, 작은 쪽지에 번호만 한 번 더 옮겨 적었다.',
+      '뒤에서 의자를 툭. 형석이의 발이다.',
+      '쪽지를… 책상 밑으로 떨어뜨렸다.',
+      '그때, 맨 뒷자리. 재민이가 고개를 들었다. 나랑 눈이 마주쳤다.',
+      '재민이는 아무 말도 하지 않았다. 대신 아주 천천히 고개를 끄덕였다. "알아." 하듯이.',
+      '그리고 감독석의 문병철 선생님은…',
+      '…창밖만 보고 계셨다. 처음부터 끝까지.',
+    );
+    startGlitch(1.2);
+    await fadeBlack();
+    endMemory();
+    setupDay(1, { x: 57.5, y: 27.6, dir: 'up' });
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    await fadeInAsync();
+    await say(
+      { who: '이수아 선생님', text: '…그래서 재민이는 나 때문에 전학 갔어. 형석이는 시킨 적 없어. 내가 보여 준 거야.' },
+      { who: '이수아 선생님', text: '그렇게 말해야 했어. 그래야 끝났으니까.' },
+      '…선생님의 기억에는, 금이 간 곳이 두 군데 있었다.',
+    );
+    giveClue(CONTRA_SH_THREAT);
+    giveClue(CONTRA_SH_WINDOW, '새 단서: 모순 2개  (Tab)');
+    flags.suahMemDone = true;
+    addEvidence(2);
+    await say(
+      { who: ME, text: '선생님 기억 속 형석이는… 부탁하지 않았어요. 사물함을 찼어요.' },
+      { who: '이수아 선생님', text: '…증거 있니? 28년 전 일이야. 형석이는 지금 동문회장이고.' },
+      { who: FRIEND, text: '(지후야. 쪽지 뒷면 글씨. 그게 고형석 글씨라는 걸 보여 주면 돼.)' },
+      { who: FRIEND, text: '(체육관! 기념식 방명록. 어제 리허설 때 동문회장이 와서 썼다고 은비가 그랬어.)' },
+    );
+  },
+
+  // 체육관 무대 옆 방명록
+  async guestbook() {
+    if (!flags.ch3 || !flags.suahMemDone) {
+      await say('기념식 방명록. 아직 몇 장 안 찼다.');
+      return;
+    }
+    if (flags.gotGuestbook) {
+      await say('방명록. 고형석의 서명이 첫 장을 크게 차지하고 있다.');
+      return;
+    }
+    flags.gotGuestbook = true;
+    await say(
+      '무대 옆 받침대 위에 방명록이 펼쳐져 있다. "개교 52주년 기념식 방명록"',
+      '첫 장, 굵은 펜 글씨.',
+      '"모교의 무궁한 발전을 기원합니다. — 동문회장 고형석"',
+      '비스듬히 누운 획. 갈고리처럼 꺾인 줄표.',
+      { who: FRIEND, text: '…쪽지 뒷면이랑 똑같은데?' },
+      '휴대폰으로 서명을 찍었다.',
+    );
+    giveClue(GUEST_CLUE);
+    await say({ who: FRIEND, text: '교무실로 가자. 수아 선생님한테 보여 드리자.' });
+  },
+
+  // 교무실: 필체 대조 → 교감의 기억 → 감독표 대조
+  async suahFight() {
+    await say('이수아 선생님은 아직 그 자리에 앉아 있었다.', { who: ME, text: '선생님. 확인하고 싶은 게 있어요.' });
+    if (!await Experiment.start(EXPERIMENTS.handwriting)) return;
+    flags.suahWon = true;
+    addEvidence(1);
+    await say(
+      '이수아 선생님이 두 손으로 얼굴을 감쌌다.',
+      { who: '이수아 선생님', text: '…28년 동안, 내 탓이라고 생각하면 견딜 수 있었어.' },
+      { who: '이수아 선생님', text: '형석이가 무서웠다고 말하는 것보다, 내가 나빴다고 말하는 게 덜 무서웠거든.' },
+      { who: '이수아 선생님', text: '재민이는… 날 지켜 주려다 쫓겨났는데.' },
+    );
+    // 선택: 공감 / 증언 요구 — 수아의 마음
+    const kind = await choose(['선생님의 어깨가 떨린다.'],
+      ['"선생님 잘못이 아니에요."', '"내일 기념식에서, 사실대로 말해 주세요."']) === 0;
+    if (kind) {
+      addHeart('suah', 2);
+      await say(
+        { who: ME, text: '선생님 잘못이 아니에요. 열일곱 살이었잖아요.' },
+        '선생님이 고개를 들었다. 눈가가 빨갰다.',
+        { who: '이수아 선생님', text: '…고마워, 지후야.' },
+        { who: '이수아 선생님', text: '내일. …내가, 내 입으로 말할게. 이번엔.' },
+      );
+    } else {
+      addHeart('suah', 1);
+      await say(
+        { who: ME, text: '내일 기념식에서, 사실대로 말해 주세요. 고형석 앞에서.' },
+        { who: '이수아 선생님', text: '……' },
+        { who: '이수아 선생님', text: '…생각해 볼게. 그게 지금 할 수 있는 대답이야.' },
+      );
+    }
+    flags.suahTestify = route.heart.suah >= 2;
+    await SCRIPTS.gyogamScene();
+  },
+
+  async gyogamScene() {
+    const g = addActor('gyogam', 56.5, 20.6, 'down', 1);
+    await walkActor(g, 56.5, 23, 0.8);
+    g.dir = 'down';
+    await say(
+      { who: '교감', text: '서지후. 박건우.' },
+      '교감 선생님이 교무실 문 앞에 서 있었다.',
+      { who: '교감', text: '창고 무단 침입. 학교 기물 반출. 그리고 지금은… 선생님을 몰아세우는 건가.' },
+      { who: ME, text: '정재민 씨는 왜 전학 갔어요? 담임이셨잖아요.' },
+      { who: '교감', text: '…그 학생은 친구를 모함하고, 폭력까지 썼다. 생활기록부에 다 남아 있다.' },
+      { who: '교감', text: '"12월 15일 10시 55분, 2층 복도에서 정재민이 고형석을 폭행." 내가 직접 봤다.' },
+      { who: '이수아 선생님', text: '…교감 선생님.' },
+      { who: '교감', text: '이 선생님은 가만히 계세요. 내가 본 걸 말해 주지. 똑똑히.' },
+    );
+    // 문병철의 기억: 말하는 대로의 장면 → 뒤집힌 진짜 장면 → 그날 저녁
+    startGlitch(1.2);
+    await fadeBlack();
+    await showChapter('문병철의 기억\n1998년 12월 15일 오전 10시 55분', 2.2);
+    beginMemory('gyogam', 'p2', { x: 36, y: 18.4, dir: 'right' });
+    const j = addActor('jaemin98', 40.5, 18.4, 'left', 'p2');
+    const h = addActor('hyungseok98', 41.6, 18.4, 'left', 'p2');
+    await fadeInAsync();
+    await say('복도. 시험 기간이라 조용하다.', '그때 정재민이 고형석의 멱살을 잡았다.');
+    h.dir = 'left';
+    j.dir = 'right';
+    await say({ who: '정재민', text: '너 수아한테 무슨 짓 했어!' }, '주먹이 날아갔다. 고형석이 사물함에 부딪혔다.', '…나는 똑똑히 봤다.');
+    startGlitch(1.4);
+    await wait(0.4);
+    actors.length = 0;
+    player.x = 48.5 * TILE;
+    player.y = 22.6 * TILE;
+    player.dir = 'right';
+    camFocus = { x: 47 * TILE, y: 25 * TILE };
+    for (const [x, y] of [[42, 24.2], [44, 26.2], [48, 24.2], [50, 28.2], [42, 28.2], [44, 28.2]]) addActor('student98', x, y, 'up', 'p2');
+    addActor('suah98', 44.5, 26.4 - 2, 'up', 'p2');
+    addActor('jaemin98', 52.5, 28.2, 'up', 'p2');
+    await say(
+      '…10시 55분.',
+      '3교시 수학. 나는 2학년 6반 감독석에 서 있었다.',
+      '정재민은 맨 뒷자리에서 시험지를 풀고 있었다.',
+      '복도에는… 아무도 없었다.',
+    );
+    startGlitch(1.4);
+    await wait(0.4);
+    actors.length = 0;
+    player.dir = 'down';
+    addActor('chairman98', 48.5, 25, 'up', 'p2');
+    await say(
+      '그날 저녁. 빈 교실.',
+      { who: '운영위원장', text: '선생님. 기록은 이렇게 쓰시죠. "10시 55분, 2층 복도. 정재민이 폭행."' },
+      { who: '운영위원장', text: '신관 공사, 이번에 우리 회사가 맡기로 했잖습니까. 선생님 교무부장 자리도 얘기 다 됐고요.' },
+      '…나는 펜을 들었다.',
+    );
+    startGlitch(1.2);
+    await fadeBlack();
+    endMemory();
+    setupDay(1, { x: 57.5, y: 27.6, dir: 'up' });
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    const g2 = addActor('gyogam', 56.5, 23, 'down', 1);
+    await fadeInAsync();
+    await say({ who: '교감', text: '…나는 봤다. 봤어.' }, '교감 선생님의 목소리가 조금 흔들렸다.');
+    giveClue(CONTRA_GG_SEAT);
+    giveClue(CONTRA_GG_GUEST, '새 단서: 모순 2개  (Tab)');
+    addEvidence(2);
+    await wait(0.3);
+    if (!await Experiment.start(EXPERIMENTS.timetable)) return;
+    flags.gyogamWon = true;
+    addEvidence(2);
+    await say(
+      '교감 선생님이 빈 의자에 털썩 주저앉았다.',
+      { who: '교감', text: '…운영위원장님이 쓰라는 대로 썼다. 형석이 아버지.' },
+      { who: '교감', text: '신관 공사, 학교 예산, 내 자리… 그 사람 말 한마디에 다 달려 있었다. 스물아홉 살 담임이 뭘 할 수 있었겠나.' },
+      { who: '교감', text: '정재민이 증거를 들고 왔을 때, 나는 그 애를 막았다. 전학을 "권했다". 조용히 끝내자고.' },
+      { who: '교감', text: '그 교실을 잠근 것도 나다. 열 때마다… 그 애 자리가 보여서.' },
+      { who: ME, text: '…"아직 그대로군." 그 말, 그 뜻이었어요?' },
+      { who: '교감', text: '……' },
+      { who: '교감', text: '내일 기념식은 예정대로 한다. 고형석 회장은 감사패를 받는다. 너희가 뭘 하든.' },
+      '교감 선생님은 그 말만 남기고 교무실을 나갔다. 등이 작아 보였다.',
+    );
+    await walkActor(g2, 56.5, 20.6, 0.9);
+    removeActor(g2);
+    await say(
+      { who: '이수아 선생님', text: '…지후야. 재민이, 찾을 수 있겠니?' },
+      { who: ME, text: '…찾아볼게요.' },
+      { who: FRIEND, text: '너네 아빠. 이제 진짜 다 물어봐야 해.' },
+    );
+    await fadeBlack();
+    actors.length = 0;
+    await showChapter('그날 저녁', 1.8);
+    flags.thuEvening = true;
+    companion.visible = companion.following = false;
+    ambient = EVENING;
+    setFloor('home', HOME_DOOR);
+    await fadeInAsync();
+    await say('아빠는 식탁에 앉아 있다. 노트북은 꺼져 있다.', '…내일은 기념식이다. 오늘 물어봐야 한다.');
+  },
+
+  // 목요일 저녁: 아빠
+  async dadThu() {
+    if (flags.dadConfessed) {
+      await say('아빠는 메모를 손에 쥔 채 가만히 앉아 있다.');
+      return;
+    }
+    if (flags.dadRefused) {
+      await say('아빠 방 문은 닫혀 있다.');
+      return;
+    }
+    if (route.heart.dad < 2) {
+      flags.dadRefused = true;
+      await say(
+        { who: ME, text: '아빠. 오늘 이수아 선생님이랑 교감 선생님 만났어.' },
+        '아빠가 의자에서 일어났다.',
+        { who: '아빠', text: '…그만하라고 했잖아.' },
+        { who: '아빠', text: '피곤하다. 먼저 잘게.' },
+        '아빠는 방으로 들어갔다. 검은 가방이 거실 구석에 그대로 놓여 있다.',
+      );
+      return;
+    }
+    await say(
+      { who: ME, text: '아빠. 오늘 이수아 선생님이랑 교감 선생님 만났어. 다 들었어. 시험, 쪽지, 생활기록부.' },
+      '아빠가 한참 아무 말도 하지 않았다.',
+      { who: '아빠', text: '…앉아. 이제는 말해야겠다.' },
+    );
+    await SCRIPTS.dadConfess();
+  },
+
+  // 목요일 밤: 아빠의 검은 가방 (아빠가 말을 피했을 때)
+  async dadBag() {
+    if (!flags.thuEvening || !flags.dadRefused || flags.readDiary || flags.dadConfessed) {
+      await say('아빠의 검은 가방. 회사 서류가 들어 있겠지.');
+      return;
+    }
+    const open = await choose(['아빠의 검은 가방. 지퍼 사이로 낡은 공책 모서리가 보인다.'], ['열어 본다', '…그만둔다']) === 0;
+    if (!open) return;
+    flags.readDiary = true;
+    addHeart('dad', -1);
+    await say(
+      '공책을 꺼냈다. 표지에 "1998"이라고 적혀 있다. 아빠의 일기장이다.',
+      '"12월 16일. 점심 방송에 재민이 사연이 나왔다. 첫 글자. 알아챘다. 앨범 내 얼굴 뒤."',
+      '"12월 17일. 담임이 물었다. 정재민 말이 맞냐고. 나는… 아무것도 못 봤다고 했다."',
+      '"12월 18일. 재민이 가는 날. 나가지 않았다. 앨범도 열지 않았다."',
+      '"셋, 친구를 버리지 않는다. 나는 버렸다."',
+      '…등 뒤에서 문 열리는 소리.',
+      { who: '아빠', text: '…그거.' },
+      '아빠가 서 있었다. 화를 내지 않았다. 그냥, 아주 지친 얼굴이었다.',
+      { who: '아빠', text: '…그래. 이제는 말해야겠다.' },
+    );
+    await SCRIPTS.dadConfess();
+  },
+
+  async dadConfess() {
+    flags.dadConfessed = true;
+    await say(
+      { who: '아빠', text: '재민이가 증거를 모았을 때, 아빠도 같이 있었어. 221B 마지막 사건이었지.' },
+      { who: '아빠', text: '재민이가 그랬어. 담임한테 같이 가자고. 너는 증인만 서 주면 된다고.' },
+      { who: '아빠', text: '그날 방과 후, 옥상 계단에서 형석이 패거리가 아빠를 막았어. "너도 전학 가고 싶냐."' },
+      { who: '아빠', text: '다음 날 담임이 물었어. 정재민 말이 맞냐고. 아빠는… "아무것도 못 봤어요."라고 했어.' },
+      { who: '아빠', text: '셋, 친구를 버리지 않는다. …아빠가 버렸어.' },
+      { who: '아빠', text: '사연도 들었어. 첫 글자. 알아챘어. 근데 앨범을 열지 않았어.' },
+      { who: '아빠', text: '열면… 내가 비겁했다는 걸 다시 봐야 하니까.' },
+      { who: '아빠', text: '재민이 가던 날도 안 나갔어. 그 뒤로 몇 번 전화가 왔는데, 안 받았어. 그러다 끊겼어.' },
+    );
+    giveClue(DAD_CLUE);
+    addEvidence(1);
+    await say(
+      '재민 씨의 메모를 아빠 앞에 펼쳤다.',
+      '"준호야, 이걸 찾았다면— 미안하다. 너까지 휘말리게 해서. 그리고 부탁한다."',
+      '아빠가 메모를 한참 내려다봤다.',
+      { who: '아빠', text: '…미안하다고? 재민이가? 왜… 왜 걔가.' },
+      '아빠가 울었다. 처음 보는 얼굴이었다.',
+    );
+    // 선택: 내일 같이 가 달라고 할지 — 아빠의 마음
+    const ask = await choose(['…내일은 기념식이다.'], ['"내일, 같이 가 줘."', '"…아빠는 안 와도 돼. 내가 할게."']) === 0;
+    if (ask) {
+      addHeart('dad', 1);
+      flags.dadComes = route.heart.dad >= 2;
+      await say(
+        { who: ME, text: '내일, 같이 가 줘. 아빠가 열지 못한 앨범, 내가 열었어. 이번엔 같이 가자.' },
+        flags.dadComes
+          ? { who: '아빠', text: '…가자. 이번엔. 28년 늦었지만.' }
+          : { who: '아빠', text: '…생각해 볼게. 아빠가 거기 설 자격이 있는지.' },
+      );
+    } else {
+      await say({ who: ME, text: '…아빠는 안 와도 돼. 내가 할게.' }, '아빠는 대답하지 않았다. 대신 메모를 오래 쥐고 있었다.');
+    }
+    await say(
+      { who: '아빠', text: '재민이는 해원고로 전학 갔어. …그 뒤는 아빠도 몰라.' },
+      '…해원고. 찾아볼 수 있다. 내 방 책상에서.',
+    );
+  },
+
+  // 목요일 밤: 정재민 경위에게 전화
+  async callJaemin() {
+    flags.calledJaemin = true;
+    await say(
+      '"해원고 정재민" 검색.',
+      '…졸업생 인터뷰 기사 하나. 2024년, 지역 신문.',
+      '"해원고 출신 정재민 경위, 10년 추적 끝에 보이스피싱 조직 검거"',
+      '사진 속 남자. 동그란 안경. 장난기는 사라졌지만… 그 얼굴이다.',
+      '"증거 없이는 말하지 않는다. 학창 시절 동아리 규칙이었죠." — 정재민 경위',
+    );
+    giveClue(NEWS_CLUE);
+    await say(
+      '기사에 적힌 해원경찰서 번호로 전화를 걸었다. 밤 10시.',
+      '…신호음.',
+      { who: '당직 경찰관', text: '해원경찰서입니다.' },
+      { who: ME, text: '저… 정재민 경위님 계세요? 개인적인 일인데요.' },
+      { who: '당직 경찰관', text: '잠깐만요. …마침 계시네.' },
+      '……',
+      { who: '정재민', text: '정재민입니다.' },
+      { who: ME, text: '…저, 서지후라고 합니다. 서준호 아들이에요.' },
+      '긴 침묵.',
+      { who: '정재민', text: '…준호, 아들.' },
+      { who: '정재민', text: '준호는… 잘 지내니.' },
+      { who: ME, text: '동산고 2층 창고에서 앨범을 찾았어요. 사진 뒤의 쪽지도요.' },
+      { who: '정재민', text: '……' },
+      { who: '정재민', text: '…미안하다. 그 학교 일엔 다시 엮이고 싶지 않아. 28년이야. 다 끝난 일이다.' },
+    );
+    // 선택: 무슨 말로 붙잡을지 — 재민의 마음
+    const pick = await choose(['전화가 끊길 것 같다. 뭐라고 해야 할까.'],
+      ['메모의 마지막 줄을 읽어 드린다', '"아빠가… 울었어요."', '"내일 기념식에서 다 밝힐 거예요."']);
+    if (pick === 0) {
+      addHeart('jaemin', 2);
+      await say(
+        { who: ME, text: '"준호야, 이걸 찾았다면— 미안하다. 그리고 부탁한다. — J"' },
+        { who: '정재민', text: '…그걸 찾았구나. 결국 준호가 아니라, 준호 애가.' },
+        { who: '정재민', text: '부탁한다고 썼었지. 열일곱 살짜리가 뭘 부탁할 수 있었을까. …수아를 부탁한다는 거였어.' },
+      );
+    } else if (pick === 1) {
+      addHeart('jaemin', flags.dadComes ? 2 : 1);
+      await say(
+        { who: ME, text: '아빠가 울었어요. 사연 첫 글자, 알아챘는데 무서워서 앨범을 못 열었대요.' },
+        { who: '정재민', text: '…준호가.' },
+        { who: '정재민', text: '알아챘구나. …그걸로 됐어. 그거면 됐다.' },
+      );
+    } else {
+      await say(
+        { who: ME, text: '내일 개교기념식에서 다 밝힐 거예요. 고형석 앞에서.' },
+        { who: '정재민', text: '…그러다 너만 다친다. 고형석은 그때도 지금도, 변호사가 다섯은 붙어 있어.' },
+      );
+    }
+    flags.jaeminMaybe = route.heart.jaemin >= 2;
+    await say(flags.jaeminMaybe
+      ? { who: '정재민', text: '…내일 몇 시라고? 열 시. …약속은 못 한다. 그래도, 기억해 둘게.' }
+      : { who: '정재민', text: '…늦었다. 끊자. 준호한테… 아니다. 끊을게.' });
+    await say(
+      '뚝. 전화가 끊겼다.',
+      '내일은 금요일. 개교 52주년 기념식.',
+      '28년 동안 잠겨 있던 교실의 문을, 내일 연다.',
+    );
+    flags.ch3Done = true;
+    await fadeBlack();
+    await showChapter('3장 「1998년의 시험」 끝', 2.4);
+    await showChapter('4장 「다시 열린 교실」\n— 만드는 중 —', 2.6);
+    setFloor('home', HOME_START);
     await fadeInAsync();
   },
 
   // ───────── 건우에게 묻기 (Q) ─────────
   async friend() {
     let pages;
+    if (flags.ch3) {
+      if (flags.thuEvening) pages = [{ who: FRIEND, text: '(건우는 집에 갔다.)' }];
+      else if (flags.gotGuestbook) pages = [{ who: FRIEND, text: '교무실! 방명록 서명이랑 쪽지 뒷면, 수아 선생님 앞에서 맞춰 보자.' }];
+      else if (flags.suahMemDone) pages = [{ who: FRIEND, text: '체육관 무대 옆에 방명록 있어. 운동장 오른쪽 끝.' }, { who: FRIEND, text: '고형석 글씨만 있으면 돼.' }];
+      else pages = [{ who: FRIEND, text: '교무실은 1층 오른쪽 끝이야. 수아 선생님, 창가 자리.' }];
+      await say(...pages);
+      return;
+    }
     if (flags.ch2) {
       if (flags.ch2Done) pages = [{ who: FRIEND, text: '이수아 선생님… 국어 시간에 얼굴 어떻게 보지.' }, { who: FRIEND, text: '(3장은 아직 만드는 중이다.)' }];
       else if (flags.foundNote) pages = [{ who: FRIEND, text: '창문! 나가서 얘기하자.' }];
@@ -1429,6 +2140,12 @@ const DEV_STAGES = [
   ['2장 — 수요일 점심 (은비)', 'wed'],
   ['2장 — 방송실 앞 (사연 테이프·해독)', 'tape'],
   ['2장 — 해독 후, 창고 다시 (앨범 두고 온 경우)', 'room2'],
+  ['3장 — 목요일 1교시 국어', 'ch3'],
+  ['3장 — 교무실 (이수아의 기억 들어가기)', 'suah'],
+  ['3장 — 기억에서 돌아옴 (방명록 찾으러)', 'guest'],
+  ['3장 — 방명록 얻음 (교무실로: 필체·감독표 대결)', 'hand'],
+  ['3장 — 목요일 저녁 (아빠 마음 높음)', 'thu'],
+  ['3장 — 목요일 저녁 (아빠 마음 낮음 → 가방)', 'thulow'],
 ];
 
 const findClue = name => { const c = CLUES.find(k => k.name === name); if (c) c.found = true; };
@@ -1508,7 +2225,40 @@ function devStage(stage) {
   Object.assign(flags, { heardTape: true, decoded: true, roomAgain: true });
   TAPE_CLUE.found = true;
   route.evidence = 5;
-  setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);
+  if (stage === 'room2') return setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);
+  // 3장: 2장을 다 본 상태
+  Object.assign(flags, { roomAgain: false, foundNote: true, ch2Done: true, ch3: true });
+  NOTE_CLUE.found = MEMO_CLUE.found = true;
+  route.evidence = 7;
+  route.heart.jaemin = 1;
+  if (stage === 'ch3') return runScript('ch3Start');
+  flags.suahClass = true;
+  if (stage === 'suah') {
+    setupDay(1, { x: 57.5, y: 20.5, dir: 'down' });
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    return;
+  }
+  Object.assign(flags, { suahMet: true, shHall: true, shExam: true, suahMemDone: true });
+  CONTRA_SH_THREAT.found = CONTRA_SH_WINDOW.found = true;
+  route.evidence = 9;
+  if (stage === 'guest') {
+    setupDay(1, { x: 74, y: 44.4, dir: 'up' });
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    return;
+  }
+  flags.gotGuestbook = GUEST_CLUE.found = true;
+  if (stage === 'hand') {
+    setupDay(1, { x: 57.5, y: 20.5, dir: 'down' });
+    addActor('suah', 57.5, 25.4, 'down', 1);
+    return;
+  }
+  Object.assign(flags, { suahWon: true, suahTestify: true, gyogamWon: true, thuEvening: true });
+  CONTRA_GG_SEAT.found = CONTRA_GG_GUEST.found = true;
+  route.evidence = 14;
+  route.heart.suah = 2;
+  route.heart.dad = stage === 'thu' ? 3 : 0;
+  ambient = EVENING;
+  setFloor('home', HOME_DOOR);
 }
 
 const onOff = v => (v ? '켬' : '끔');

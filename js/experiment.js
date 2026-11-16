@@ -32,6 +32,205 @@ const EX_COLORS = {
 // init() → 상태, update(m, dt) → 끝나면 { dmg, pages, solved?, once?, miss? }, draw(g, m, ox, oy, t)
 //   miss: 실패한 시도 (정신력이 깎인다)
 const MINIGAMES = {
+  // 필체 대조: 쪽지 뒷면의 거친 글씨를 두 사람의 글씨와 한 글자씩 비교한다
+  //   세 글자(형 · 석 · 줄표 —) 각각, 어느 쪽 글씨와 같은지 A/D 로 고르고 F
+  handwriting: (() => {
+    const W = 282, H = 142;
+    // 7×7 픽셀 글씨 (1 = 획). 쪽지 = 고형석 (비스듬하고 꺾쇠처럼 날카롭다), 수아 = 둥글고 반듯하다
+    const G = {
+      hyung: {
+        rough: ['1111100', '0011000', '0111100', '1000010', '0111100', '0001000', '1111111'],
+        suah: ['0111110', '0001000', '0111110', '0100010', '0111110', '0001000', '0111110'],
+      },
+      seok: {
+        rough: ['1001001', '0110001', '1001011', '0000001', '1111110', '0000010', '0000100'],
+        suah: ['0100010', '0100010', '1010110', '0000010', '0111110', '0000010', '0000010'],
+      },
+      dash: {
+        rough: ['0000000', '0000000', '0000000', '1111110', '0000011', '0000000', '0000000'],
+        suah: ['0000000', '0000000', '0000000', '0111110', '0000000', '0000000', '0000000'],
+      },
+    };
+    const ROUNDS = [
+      { key: 'hyung', label: '"형" — 위 꼭지가 길게 누웠다' },
+      { key: 'seok', label: '"석" — ㅅ이 X자처럼 엇갈린다' },
+      { key: 'dash', label: '"—" — 끝이 갈고리처럼 꺾인다' },
+    ];
+    const SAMPLES = ['이수아의 글씨 (쪽지 앞면 답)', '고형석의 서명 (기념식 방명록)'];
+    const ROUGH = 1;   // 정답: 고형석
+    const glyph = (g, rows, x, y, s, c) => rows.forEach((row, r) => {
+      for (let i = 0; i < 7; i++) if (row[i] === '1') rect(g, x + i * s, y + r * s, s, s, c);
+    });
+
+    return {
+      init: saved => (saved ? { ...saved, t: 0 } : { round: 0, pick: 0, t: 0 }),
+
+      update(m, dt) {
+        m.t += dt;
+        const d = (tapped.has('right') || tapped.has('down') ? 1 : 0) - (tapped.has('left') || tapped.has('up') ? 1 : 0);
+        if (d) {
+          m.pick = (m.pick + d + 2) % 2;
+          Sound.sfx('move');
+        }
+        if (m.t > 0.3 && tapped.has('interact')) {
+          if (m.pick !== ROUGH) {
+            return { dmg: 0, miss: true, keep: m, pages: ['…획이 다르다. 수아 선생님 글씨는 둥글고 반듯하다.', '쪽지 뒷면 글씨는 그렇지 않다.'] };
+          }
+          Sound.sfx('good');
+          m.round++;
+          m.t = 0;
+          m.pick = 0;
+          if (m.round < ROUNDS.length) return null;
+          return {
+            dmg: 50, solved: true,
+            pages: [
+              '세 글자 모두, 방명록의 서명과 같은 손이다.',
+              { who: ME, text: '쪽지 앞면의 답은 선생님 글씨. 뒷면의 "안 하면 알지?"는 고형석 글씨예요.' },
+              { who: ME, text: '선생님이 먼저 보여 준 거라면, 고형석이 왜 뒷면에 협박을 써야 했어요?' },
+              '주장의 신뢰도가 크게 무너졌다!',
+            ],
+          };
+        }
+        return null;
+      },
+
+      draw(g, m, ox, oy, t) {
+        rect(g, ox, oy, W, H, '#1a1e2a');
+        g.font = WORD_FONT;
+        g.textBaseline = 'middle';
+        const R = ROUNDS[Math.min(m.round, ROUNDS.length - 1)];
+        g.fillStyle = '#8fa6c8';
+        g.fillText(`비교 ${Math.min(m.round + 1, 3)} / 3   ${R.label}`, ox + 8, oy + 10);
+        // 왼쪽: 쪽지 뒷면 (확대경)
+        rect(g, ox + 10, oy + 22, 110, 84, '#f4f0e0');
+        g.fillStyle = '#7a6a5a';
+        g.fillText('쪽지 뒷면', ox + 14, oy + 30);
+        glyph(g, G[R.key].rough, ox + 37, oy + 42, 8, '#8a2a2a');
+        ring(g, ox + 65, oy + 70, 36, '#c8a03a');
+        // 오른쪽: 고른 견본
+        const sx = ox + 160;
+        rect(g, sx, oy + 22, 110, 84, '#f4f0e0');
+        g.fillStyle = '#7a6a5a';
+        g.fillText(m.pick ? '방명록 서명' : '수아의 판서', sx + 4, oy + 30);
+        glyph(g, m.pick ? G[R.key].rough : G[R.key].suah, sx + 27, oy + 42, 8, m.pick ? '#2a2a2a' : '#2a2a6a');
+        // 가운데 화살표
+        g.fillStyle = '#ffe066';
+        g.fillText('◀ ▶', ox + 128, oy + 64);
+        // 지난 판정
+        for (let i = 0; i < 3; i++) rect(g, ox + 230 + i * 12, oy + 6, 8, 8, i < m.round ? '#5fdc7a' : '#2a3448');
+        rect(g, ox + 4, oy + H - 24, W - 8, 20, '#0e1420');
+        g.fillStyle = '#e8eef8';
+        g.fillText(`견본: ${SAMPLES[m.pick]}`, ox + 10, oy + H - 14);
+      },
+    };
+  })(),
+
+  // 감독표 대조: "12월 15일 10시 55분, 2층 복도"라는 기록이 시험 시간표의 어느 칸에 들어가는지 찾고,
+  //   그 시각 정재민과 문병철이 어디 있었는지 따진다
+  timetable: (() => {
+    const W = 282, H = 142;
+    const DAYS = ['12.14 (월)', '12.15 (화)', '12.16 (수)', '12.17 (목)'];
+    const PERIODS = [
+      { label: '1교시 8:50~9:40', subj: ['국사', '영어', '과학', '사회'] },
+      { label: '2교시 9:50~10:40', subj: ['수학', '국어', '한문', '영어'] },
+      { label: '3교시 10:50~11:40', subj: ['과학', '수학', '국어', '기술'] },
+      { label: '쉬는 시간 11:40~', subj: ['', '', '', ''] },
+    ];
+    const TARGET = { day: 1, period: 2 };
+    const QUIZ = { q: '12월 15일 10시 55분. 정재민은 어디 있었을까?', options: ['2층 복도', '2학년 6반 시험장', '보건실'], answer: 1 };
+
+    return {
+      init: saved => saved || { day: 0, period: 0, phase: 'grid', pick: 0, t: 0 },
+
+      update(m, dt) {
+        m.t += dt;
+        if (m.phase === 'grid') {
+          const dx = (tapped.has('right') ? 1 : 0) - (tapped.has('left') ? 1 : 0);
+          const dy = (tapped.has('down') ? 1 : 0) - (tapped.has('up') ? 1 : 0);
+          if (dx || dy) {
+            m.day = (m.day + dx + 4) % 4;
+            m.period = (m.period + dy + 4) % 4;
+            Sound.sfx('move');
+          }
+          if (m.t > 0.3 && tapped.has('interact')) {
+            if (m.day === TARGET.day && m.period === TARGET.period) {
+              Sound.sfx('good');
+              m.phase = 'quiz';
+              m.t = 0;
+              return null;
+            }
+            return { dmg: 0, miss: true, keep: { ...m, t: 0 }, pages: ['…그 칸이 아니다.', '기록의 시각은 12월 15일 10시 55분. 날짜와 시각을 다시 맞춰 보자.'] };
+          }
+          return null;
+        }
+        const d = (tapped.has('down') || tapped.has('right') ? 1 : 0) - (tapped.has('up') || tapped.has('left') ? 1 : 0);
+        if (d) {
+          m.pick = (m.pick + d + QUIZ.options.length) % QUIZ.options.length;
+          Sound.sfx('move');
+        }
+        if (tapped.has('menu')) {
+          m.phase = 'grid';
+          return null;
+        }
+        if (m.t > 0.3 && tapped.has('interact')) {
+          if (m.pick === QUIZ.answer) {
+            return {
+              dmg: 50, solved: true,
+              pages: [
+                '12월 15일, 3교시 수학. 10시 50분부터 11시 40분까지.',
+                '감독: 담임 문병철. 장소: 2학년 6반. 응시: 36명 전원.',
+                { who: ME, text: '10시 55분이면 시험 시작 5분 뒤예요. 정재민 씨는 교실에서 시험을 보고 있었어요.' },
+                { who: ME, text: '그리고 교감 선생님은… 그 교실 감독석에 앉아 계셨어요. 복도를 볼 수가 없었어요.' },
+                '기록의 신뢰도가 크게 무너졌다!',
+              ],
+            };
+          }
+          return { dmg: 0, miss: true, keep: { ...m, t: 0 }, pages: ['…그럴 수 없다. 3교시는 시험 중이었다.'] };
+        }
+        return null;
+      },
+
+      draw(g, m, ox, oy, t) {
+        rect(g, ox, oy, W, H, '#efe8d6');
+        g.font = WORD_FONT;
+        g.textBaseline = 'middle';
+        g.fillStyle = '#5a4a3a';
+        g.fillText('1998 2학기 기말고사 · 2학년 6반 · 감독 문병철', ox + 6, oy + 8);
+        const X0 = ox + 74, Y0 = oy + 18, CW = 50, CH = 20;
+        DAYS.forEach((d, i) => {
+          g.fillStyle = '#5a4a3a';
+          g.fillText(d, X0 + i * CW + 4, Y0 + 6);
+        });
+        PERIODS.forEach((p, r) => {
+          const y = Y0 + 14 + r * CH;
+          g.fillStyle = '#5a4a3a';
+          g.fillText(p.label.split(' ')[0], ox + 6, y + 6);
+          g.fillStyle = '#8a7a6a';
+          g.fillText(p.label.split(' ')[1] || '', ox + 6, y + 15);
+          p.subj.forEach((s, c) => {
+            const x = X0 + c * CW, sel = m.phase === 'grid' && m.day === c && m.period === r;
+            const hit = m.phase === 'quiz' && c === TARGET.day && r === TARGET.period;
+            rect(g, x, y, CW - 2, CH - 2, hit ? '#ffe066' : sel ? '#cfe3f2' : '#f8f4ea');
+            rect(g, x, y + CH - 3, CW - 2, 1, '#c8c0aa');
+            g.fillStyle = '#2a2a30';
+            g.fillText(s || '—', x + 6, y + 9);
+          });
+        });
+        rect(g, ox + 4, oy + H - 22, W - 8, 20, '#0e1420');
+        g.fillStyle = '#e8eef8';
+        if (m.phase === 'quiz') {
+          g.fillText(QUIZ.q, ox + 8, oy + H - 17);
+          QUIZ.options.forEach((o, i) => {
+            g.fillStyle = i === m.pick ? '#ffe066' : '#8fa6c8';
+            g.fillText((i === m.pick ? '▸ ' : '  ') + o, ox + 8 + i * 90, oy + H - 7);
+          });
+        } else {
+          g.fillText('기록: "12.15 10:55, 2층 복도, 정재민 폭행" — 어느 칸?', ox + 8, oy + H - 12);
+        }
+      },
+    };
+  })(),
+
   // 사연 해독: 1998년 정재민의 사연 여섯 문장에서 글자를 뽑아 숨은 말을 찾는다
   //   읽는 방법(A/D) × 순서(W/S)를 바꾸면 뽑힌 글자가 바로 보인다. F로 확정.
   acrostic: (() => {
