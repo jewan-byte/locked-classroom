@@ -2459,7 +2459,7 @@ const SCRIPTS = {
   async finish(n) {
     const NAMES = { 1: '다시 열린 교실', 2: '221B', 3: '소문', 4: '다시 잠긴 교실' };
     await fadeBlack();
-    await showChapter(`엔딩 ${n}\n「${NAMES[n]}」`, 3.2);
+    await showChapter(`「${NAMES[n]}」`, 3.2);   // 몇 번째 엔딩인지는 보여 주지 않는다
     // 숨은 에필로그: 프롤로그에서 아빠의 학교 얘기를 들었고, 진실을 소문으로 만들지 않았다면
     if (flags.dadStory && !flags.rumorNote && (n === 1 || n === 2)) {
       await showChapter('에필로그\n「221B, 다시」', 2.6);
