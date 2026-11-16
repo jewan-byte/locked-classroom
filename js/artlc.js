@@ -105,3 +105,9 @@ Object.assign(OBJ_ART, {
 
 // 단서 그림에 쓰는 숫자 0 (art.js 의 DIGITS 는 엘리베이터용 1~3만 있다)
 DIGITS[0] = ['111', '101', '101', '101', '111'];
+
+// 1998년 방송부 DJ (사연 해독 대결의 상대): 1998년 남색 교복, 붉은 넥타이, 헤드폰
+PEOPLE.dj98 = {
+  pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3020', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' },
+  glasses: true,
+};

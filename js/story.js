@@ -51,6 +51,22 @@ function resetFlags() {
     mondayEvening: false,// 월요일 저녁, 집
     toldDad: false,      // 아빠에게 사진을 보여 줌
     day1Done: false,     // 1장 끝
+    // 2장 「사라진 얼굴」
+    ch2: false,          // 11월 17일 화요일 점심시간
+    sawReport: false,    // 동아리 창고: 221B 활동 보고서 (정재민)
+    tueEvening: false,   // 화요일 저녁, 집
+    askedJaemin: false,  // 아빠에게 정재민을 물어봄
+    bandDone: false,     // 동창 밴드에 메시지 (아무도 모른다)
+    wed: false,          // 11월 18일 수요일 점심시간
+    toBroadcast: false,  // 은비가 방송실로 먼저 감
+    heardTape: false,    // 1998년 사연 테이프를 들음
+    decoded: false,      // 사연 해독 대결 승리: "앨범 내 얼굴 뒤"
+    roomAgain: false,    // 앨범이 창고에 있어서 방과 후 다시 들어가야 한다
+    inRoom2: false,      // 두 번째로 창고 안
+    foundNote: false,    // 파인 사진 뒤에서 쪽지 원본 + 재민의 메모
+    leftRoom2: false,    // 두 번째로 창고에서 나옴
+    rumorNote: false,    // 쪽지 얘기까지 대숲에 올려도 된다고 함
+    ch2Done: false,      // 2장 끝
   });
   companion.visible = false;
   companion.following = false;
@@ -77,8 +93,122 @@ const ROLL_CLUE = storyClue('빈칸 하나', '2층 · 창고',
 // 화면 색 (main.js 의 ambient)
 const DUST = ['rgba(255,150,70,0.16)', 'rgba(30,20,12,0.38)'];   // 해 질 녘, 먼지 낀 창고
 
-// ── 과학실 실험 화면을 빌려 쓰는 '추리 대결' (2장부터) ──
-const EXPERIMENTS = {};
+// 2장 단서
+const REPORT_CLUE = storyClue('221B 활동 보고서', '1층 · 동아리 창고',
+  '추리 동아리 「221B」 1998년 보고서. 부장 정재민, 기록 서준호. 둘뿐이다.',
+  '규칙 하나, 답은 언제나 맨 앞에 있다. 둘, 증거 없이는 말하지 않는다. 셋, 친구를 버리지 않는다.',
+  '12월 활동: "2학년 6반 기말고사 건 — 조사 중". 마지막 줄: "12월 18일. 부장 전학. 활동 중지."');
+const BAND_CLUE = storyClue('동창들의 답장', '집 · 내 방',
+  '동산중 졸업생 밴드. 정재민의 연락처를 아는 사람은 아무도 없었다.',
+  '"그때 동산고에서 무슨 일 있었잖아. 시험 때. 그 뒤로 걔 얘기 하면 안 되는 분위기였어."');
+const TAPE_CLUE = storyClue('사연 테이프', '1층 · 방송실',
+  '"98.12.16 점심 — 사연". 2학년 6반 J의 작별 사연.',
+  '앨리스처럼 이상한 나라에 떨어진 기분이야. / 범인 찾기가 내 취미였던 거, 다들 알지? / 내일이면 나는 이 학교를 떠나.',
+  '얼마 안 됐지만 정말 즐거웠어. / 굴러다니던 추리소설은 동아리방에 두고 갈게. / 뒤돌아보지 말라는데, 자꾸 돌아보게 되네.',
+  '"그리고 J에게. 우리 첫 번째 규칙, 잊지 마."');
+const NOTE_CLUE = storyClue('쪽지 원본', '2층 · 창고',
+  '파인 사진 뒤, 앨범 대지 틈에 숨겨져 있던 작은 쪽지. 국어 기말고사 답이 깔끔한 글씨로 적혀 있다.',
+  '뒷면엔 거친 글씨. "다음 시간도 똑같이. 안 하면 알지? — 형석"');
+const MEMO_CLUE = storyClue('재민의 메모', '2층 · 창고',
+  '"1998.12.15 2교시 국어. 고형석 책상 밑에서 주움. 답 글씨는 이수아. 수아는 협박당하고 있다."',
+  '"담임 선생님께 말씀드렸지만 덮였다."',
+  '"준호야, 이걸 찾았다면— 미안하다. 그리고 부탁한다. — J"');
+
+// ── 추리 대결 (experiment.js 의 '추리 노트' 화면) — 주장마다 대사와 단서 반응 ──
+const EXPERIMENTS = {
+  // 2장 수요일, 방송실 — 1998년 12월 16일 점심 방송의 사연
+  acrostic: {
+    title: '사연 해독',
+    mini: 'acrostic',
+    miniHelp: 'A/D 읽는 법 · W/S 순서 · F 확정',
+    portrait: 'dj98',
+    prop: 'tape',
+    speaker: '1998년 방송부 DJ',
+    claim: '"그냥 평범한 작별 인사였어."',
+    source: '— 1998.12.16 점심 방송',
+    intro: [
+      '데크에서 지지직거리는 목소리가 흘러나온다. 28년 전 점심시간.',
+      '기억 속 방송부 DJ가 테이프를 흔든다. 별것 아닌 사연이었다고.',
+    ],
+    observe: [
+      ['사연을 다시 떠올린다.', '여섯 문장. 말투가 이상하게 딱딱 끊긴다. 한 문장, 한 문장.'],
+      ['마지막 인사가 걸린다.', '"J에게. 우리 첫 번째 규칙, 잊지 마."', '평범한 작별 인사에 왜 "규칙" 얘기를 할까?'],
+      ['첫 번째 규칙… 동아리 규칙이라면 어딘가 적혀 있을 것이다. ([단서 제시])'],
+    ],
+    clues: {
+      '221B 활동 보고서': {
+        dmg: 25, unlock: true,
+        text: [
+          '활동 보고서를 펼쳤다.',
+          { who: ME, text: '221B 규칙 하나. "답은 언제나 맨 앞에 있다."' },
+          { who: ME, text: '"J에게"의 J는 준호, 우리 아빠예요. 규칙을 잊지 말라는 건… 맨 앞을 읽으라는 거예요.' },
+          '읽는 법을 알아냈다. 이제 [추리]로 직접 풀 수 있다!',
+        ],
+      },
+      '동창들의 답장': {
+        dmg: 15,
+        text: [
+          { who: ME, text: '"그때 동산고에서 무슨 일 있었잖아. 시험 때." 동창이 그랬어요.' },
+          { who: ME, text: '평범한 전학이 아니었어요. 그 뒤로 이름도 꺼내면 안 되는 분위기였대요.' },
+          'DJ가 테이프를 쥔 손을 멈칫했다.',
+        ],
+      },
+      '1998년 달력': {
+        dmg: 10,
+        text: [
+          { who: ME, text: '방송은 12월 16일. 달력의 "J 마지막 날"은 12월 18일.' },
+          { who: ME, text: '떠나기 이틀 전에, 친구한테 꼭 남겨야 할 말이 있었던 거예요.' },
+        ],
+      },
+      '파인 사진': {
+        dmg: 15,
+        text: [
+          { who: ME, text: '평범하게 전학 간 사람이면, 앨범 사진이 왜 칼로 파여 있어요?' },
+          '"…그건 나도 몰라." DJ의 목소리가 작아졌다.',
+        ],
+      },
+      '빈칸 하나': {
+        dmg: 10,
+        text: [{ who: ME, text: '명렬표에서도 이름이 지워졌어요. 누군가 이 사람을 없었던 일로 만들려고 했어요.' }],
+      },
+      '책상의 J & J': {
+        dmg: 5,
+        text: [{ who: ME, text: '"J & J — 221B 영원히." 이 사연은 두 사람만 아는 말로 쓰였어요.' }],
+      },
+      '사연 테이프': {
+        dmg: -5,
+        text: ['테이프를 다시 내밀었다.', '…이건 주장 그 자체다. 겉으로 들으면 정말 평범한 인사일 뿐이다.'],
+      },
+    },
+    wrongClue: name => [`「${name}」을(를) 내밀었다.`, '…이 사연과는 관계가 없다.'],
+    noTarget: ['어떻게 읽어야 할지 모르겠다.', '"첫 번째 규칙"이 뭔지 먼저 알아내자. ([단서 제시])'],
+    expDone: ['이미 풀었다. "앨범 내 얼굴 뒤."'],
+    notYet: ['아직 근거가 부족하다.', '성급했다. 사연이 평범하지 않다는 걸 더 보여 줘야 한다.'],
+    broken: ['"평범한 작별 인사"의 신뢰도가 바닥났다.', '지금이라면… [반박]할 수 있다!'],
+    taunts: ['전학 가는 애들 사연, 일주일에 세 통은 왔어.', '그냥 감성 터진 고딩 편지야.', '숨은 뜻? 추리소설을 너무 많이 봤네.'],
+    tauntsWeak: ['…그러고 보니 그 애, 사연 낼 때 표정이 이상했어.', '읽는 내내 누군가한테 말하는 것 같긴 했어…'],
+    win: [
+      { who: ME, text: '이건 작별 인사가 아니라 암호예요. 221B 규칙대로, 맨 앞 글자만 읽으면 돼요.' },
+      { who: ME, text: '"앨범 내 얼굴 뒤." 정재민 씨는 증거를 앨범 속 자기 사진 뒤에 숨겼어요.' },
+      { who: ME, text: '얼굴을 판 건 누가 미워해서가 아니에요. 본인이 숨길 자리를 만든 거예요.' },
+      'DJ의 손에서 테이프가 툭 떨어졌다.',
+      '「평범한 작별 인사」를 반박했다!',
+    ],
+  },
+};
+
+// 장면마다 화면 색 (저장을 불러올 때도 쓴다)
+function sceneAmbient() {
+  if (flags.ch2) {
+    if (flags.inRoom2 && !flags.leftRoom2) return DUST;
+    if (flags.roomAgain && !flags.ch2Done) return DUSK;
+    if (flags.tueEvening && !flags.wed) return EVENING;
+    return null;
+  }
+  if (flags.mondayEvening) return EVENING;
+  if (flags.inRoom && !flags.leftRoom) return DUST;
+  return flags.afterSchool ? DUSK : null;
+}
 
 resetFlags();
 
@@ -115,6 +245,16 @@ const giveClue = (c, msg = `새 단서: ${c.name}  (Tab)`) => {
 // 방과 후: 노을, 건우가 따라다닌다
 function setupAfterSchool(where = 2, at = { x: 20, y: 30.4, dir: 'up' }) {
   ambient = DUSK;
+  actors.length = 0;
+  flags.friendJoined = true;
+  companion.visible = true;
+  companion.following = true;
+  setFloor(where, at);
+}
+
+// 낮 장면 (점심시간 등): 건우가 따라다닌다. amb: 화면 색 (없으면 null)
+function setupDay(where, at, amb = null) {
+  ambient = amb;
   actors.length = 0;
   flags.friendJoined = true;
   companion.visible = true;
@@ -166,8 +306,9 @@ function statusLines() {
   const lines = [];
   const here = floor.map.n;
   let doing = null;
-  if (flags.day1Done) doing = '2장 「사라진 얼굴」 — 만드는 중';
-  else if (flags.mondayEvening) doing = flags.toldDad ? '…오늘은 이만 자자 (내 방 침대)' : '저녁 — 아빠한테 물어볼까';
+  if (flags.ch2Done) doing = '3장 「1998년의 시험」 — 만드는 중';
+  else if (flags.ch2) doing = ch2Doing();
+  else if (flags.mondayEvening) doing = '저녁 — 아빠한테 물어볼까';
   else if (flags.leftRoom) doing = '오늘은 집으로 (1층 현관)';
   else if (flags.foundAlbum) doing = '창고 창문으로 빠져나가기';
   else if (flags.inRoom) doing = '창고 안 둘러보기 — 인증샷 찍을 만한 것';
@@ -179,6 +320,21 @@ function statusLines() {
   if (doing) lines.push({ text: doing });
   if (companion.following) lines.push({ text: '건우와 동행 중', key: 'Q', kind: 'friend' });
   return lines;
+}
+
+// 2장에서 지금 할 일
+function ch2Doing() {
+  if (flags.foundNote) return '건우와 이야기하기';
+  if (flags.inRoom2) return '창고 사물함 — 앨범 속 파인 사진 뒤';
+  if (flags.roomAgain) return '앨범은 창고에 — 2층 화장실 창문으로 다시';
+  if (flags.decoded) return '앨범 내 얼굴 뒤';
+  if (flags.toBroadcast) return '1층 방송실로 (은비가 기다린다)';
+  if (flags.wed) return '수요일 점심시간';
+  if (flags.bandDone) return '…자자';
+  if (flags.askedJaemin) return '내 방 책상 — 아빠의 중학교 동창 찾아보기';
+  if (flags.tueEvening) return '저녁 — 아빠에게 정재민에 대해 묻기';
+  if (flags.sawReport) return '오후 수업';
+  return '1층 동아리 창고에서 1998년 기록 찾기';
 }
 
 // 단서를 새로 찾을 때마다 (대사가 끝난 뒤)
@@ -234,6 +390,7 @@ const SCRIPTS = {
 
   // 아빠 (식탁)
   async dad() {
+    if (flags.ch2) return SCRIPTS.dadTue();
     if (flags.mondayEvening) return SCRIPTS.dadEvening();
     if (!flags.talkedDad) {
       flags.talkedDad = true;
@@ -299,7 +456,8 @@ const SCRIPTS = {
 
   // 집 거실 시계
   async homeClock() {
-    if (flags.mondayEvening) await say('밤 9시 10분.');
+    if (flags.tueEvening && !flags.wed) await say('밤 10시 30분.', '…28년 전에도 이 시간은 똑같이 흘렀겠지.');
+    else     if (flags.mondayEvening) await say('밤 9시 10분.');
     else await say('7시 52분.', '…버스 시간이 빠듯하다.');
   },
 
@@ -403,6 +561,10 @@ const SCRIPTS = {
 
   // 창고 문의 자물쇠
   async lockedDoor() {
+    if (flags.inRoom2 && !flags.leftRoom2) {
+      await say('문틈으로 새 쇠사슬이 보인다. 나갈 땐 창문이다.');
+      return;
+    }
     if (!flags.afterSchool) {
       await say('문에 자물쇠가 채워져 있다. "창고 — 관계자 외 출입금지"');
       return;
@@ -459,6 +621,7 @@ const SCRIPTS = {
 
   // 2층 화장실 창문
   async toiletWindow() {
+    if (flags.roomAgain && !flags.inRoom2) return SCRIPTS.backToRoom();
     if (!flags.afterSchool || flags.leftRoom) {
       await say('화장실 창문. 바깥에 좁은 콘크리트 난간이 있다.');
       return;
@@ -493,6 +656,7 @@ const SCRIPTS = {
 
   // 창고 사물함 — 학급 앨범
   async album() {
+    if (flags.inRoom2) return flags.foundNote ? say('파인 사진 뒤의 틈은 이제 비어 있다.') : SCRIPTS.findNote();
     if (flags.foundAlbum) {
       await say(flags.tookAlbum ? '사물함은 비어 있다. 앨범은 가방 안에 있다.' : '사물함 안에 학급 앨범이 그대로 꽂혀 있다.', '파인 사진은… 다시 보고 싶지 않다.');
       return;
@@ -591,6 +755,7 @@ const SCRIPTS = {
 
   // 창고 창문으로 나가기
   async roomWindow() {
+    if (flags.inRoom2 && !flags.leftRoom2) return SCRIPTS.leaveRoom2();
     if (!flags.inRoom || flags.leftRoom) {
       await say('먼지 낀 창문.');
       return;
@@ -635,6 +800,12 @@ const SCRIPTS = {
 
   // 1층 현관을 나서면
   async schoolExit() {
+    if (flags.ch2) {
+      player.y -= 10;
+      player.dir = 'up';
+      await say('…아직 학교에서 할 일이 남았다.');
+      return;
+    }
     if (!flags.leftRoom || flags.mondayEvening) {
       player.y -= 10;
       player.dir = 'up';
@@ -716,14 +887,438 @@ const SCRIPTS = {
     flags.day1Done = true;
     await fadeBlack();
     await showChapter('1장 「잠긴 교실」 끝', 2.4);
-    await showChapter('2장 「사라진 얼굴」\n— 만드는 중 —', 2.6);
-    setFloor('home', HOME_START);
+    await SCRIPTS.ch2Start();
+  },
+
+  // ───────── 2장 「사라진 얼굴」 ─────────
+
+  // 1층 방송실 캐비닛 (방송부 자료)
+  async broadcastCabinet() {
+    if (flags.heardTape) await say('90년대 테이프 칸. "98.12 점심 — 사연" 자리만 비어 있다. 데크에 꽂혀 있으니까.');
+    else await say('철제 캐비닛. 문에 "방송부 자료 — 1990년대"라고 적혀 있다.', '잠겨 있다. 방송부 열쇠가 있어야 한다.');
+  },
+
+  // 화요일 점심, 2학년 6반
+  async ch2Start() {
+    await showChapter('2장\n사라진 얼굴', 2.4);
+    await showChapter('11월 17일 화요일\n점심시간', 2.2);
+    flags.ch2 = true;
+    setupDay(2, CLASS_SEAT);
+    addActor('student1', 18.5, 24.2, 'up', 2);
+    addActor('student2', 25.5, 26.2, 'up', 2);
+    await fadeInAsync();
+    if (flags.rumorOk) {
+      await say(
+        { who: FRIEND, text: '지후야, 이거 봐. 대숲 글 조회수 3천 넘었어!' },
+        '"[잠긴 교실 진짜 들어가 봄] 얼굴 파인 사진 실존함 (사진 있음)"',
+        '댓글: "합성 아님?" "미신 셋 실화냐" "나 그 옆 화장실 쓰는데 이제 못 감"',
+        '그때, 교실 스피커가 지직거렸다.',
+        { who: '교내 방송', text: '교감입니다. 어제 방과 후 2층 창고에 무단으로 들어간 학생은, 오늘 중으로 교무실로 오기 바랍니다.' },
+        { who: FRIEND, text: '……' },
+        { who: FRIEND, text: '…글, 지금 지울게.' },
+        { who: ME, text: '…이미 늦었어. 교감쌤도 본 거야.' },
+      );
+    } else {
+      await say(
+        { who: FRIEND, text: '지후야. 어제 그거… 나 진짜 아무한테도 말 안 했다?' },
+        { who: ME, text: '…고마워.' },
+      );
+    }
+    await say(
+      { who: FRIEND, text: flags.toldDad ? '그래서, 아빠는 뭐래?' : '그래서, 아빠한테 물어봤어?' },
+      flags.toldDad
+        ? { who: ME, text: '"친구. 오래전에 연락이 끊긴." …그게 다야. 이름도 안 알려 줬어.' }
+        : { who: ME, text: '…못 물어봤어. 아빠 얼굴 보니까 말이 안 나오더라.' },
+      { who: FRIEND, text: '흠. 그럼 이름부터 알아내야겠네. 얼굴 파인 사람.' },
+      { who: FRIEND, text: '1998년이면… 아! 동아리 활동 보고서. 1층 동아리 창고에 없어진 동아리 서류가 다 쌓여 있대.' },
+      { who: FRIEND, text: '칠판의 "221B"가 동아리 이름이면, 거기 있을 거야.' },
+    );
+  },
+
+  // 1층 동아리 창고 — 221B 활동 보고서
+  async reportShelf() {
+    if (!flags.ch2) {
+      await say('없어진 동아리들의 활동 보고서 철이 꽂혀 있다.', '먼지가 너무 쌓여서 지금은 손대고 싶지 않다.');
+      return;
+    }
+    if (flags.sawReport) {
+      await say('「221B」 보고서 철. 마지막 줄이 자꾸 눈에 밟힌다.', '"12월 18일. 부장 전학. 활동 중지."');
+      return;
+    }
+    flags.sawReport = true;
+    await say(
+      '보고서 철이 연도별로 꽂혀 있다. 천문부, 문예부, 바둑부… 전부 없어진 동아리들이다.',
+      '"1998" 칸 맨 끝에 얇은 파일 하나.',
+      '"추리 동아리 「221B」 — 1998학년도 활동 보고서"',
+      { who: FRIEND, text: '찾았다…!' },
+      '첫 장, 부원 명단. "부장: 2학년 6반 정재민 / 기록: 2학년 6반 서준호" — 부원은 둘뿐이다.',
+      '그 아래 붙은 동아리 사진. 두 남학생이 책상에 앉아 어깨동무를 하고 있다.',
+      '앨범의 그 사진과 똑같은 자세. 그런데 이번엔… 왼쪽 학생의 얼굴이 있다.',
+      '동그란 안경. 장난기 가득한 웃음. 정재민.',
+      { who: ME, text: '…이 사람이었구나.' },
+      '다음 장. 손글씨로 적힌 규칙.',
+      '"221B 규칙. 하나, 답은 언제나 맨 앞에 있다. 둘, 증거 없이는 말하지 않는다. 셋, 친구를 버리지 않는다."',
+      '활동 기록. "10월 — 「사라진 체육복」 해결. 11월 — 「급식 우유 미스터리」 해결."',
+      '"12월 — 「2학년 6반 기말고사 건」 조사 중. 증거 확보."',
+      '그리고 마지막 줄. 아빠 글씨다. 꾹꾹 눌러쓴, 흔들린 글씨.',
+      '"12월 18일. 부장 전학. 활동 중지."',
+    );
+    giveClue(REPORT_CLUE);
+    addEvidence(1);
+    await say(
+      { who: FRIEND, text: '…J & J. 재민이랑 준호. 책상에 새긴 거, 너네 아빠랑 이 사람이었어.' },
+      hasClue('1998년 달력')
+        ? { who: FRIEND, text: '달력의 "J 마지막 날"도. 12월 18일. 이 사람이 전학 간 날이야.' }
+        : { who: FRIEND, text: '12월 18일에 전학… 겨울방학도 되기 전에 갑자기 떠난 거네.' },
+      { who: ME, text: '"기말고사 건"을 조사하다가… 갑자기 전학.' },
+      { who: FRIEND, text: '셋, 친구를 버리지 않는다… 근데 너네 아빠는 이 사람 얘기를 안 하잖아.' },
+      { who: ME, text: '……' },
+    );
+    Sound.sfx('chime');
+    await say('딩동댕동— 점심시간이 끝났다.', { who: FRIEND, text: '일단 수업 들어가자. 오늘 저녁엔 꼭 물어봐. 이제 이름을 알잖아.' });
+    await fadeBlack();
+    actors.length = 0;
+    await showChapter('그날 저녁', 1.8);
+    flags.tueEvening = true;
+    companion.visible = companion.following = false;
+    ambient = EVENING;
+    setFloor('home', HOME_DOOR);
+    await fadeInAsync();
+    await say('아빠는 식탁에서 노트북을 보고 있다.', '…정재민. 그 이름을 꺼내 봐야 한다.');
+  },
+
+  // 화요일 저녁: 아빠에게 정재민을 묻는다
+  async dadTue() {
+    if (!flags.tueEvening || flags.wed) {
+      await say({ who: '아빠', text: '…응?' });
+      return;
+    }
+    if (flags.askedJaemin) {
+      await say('아빠는 노트북 화면만 보고 있다. 한 글자도 안 치면서.');
+      return;
+    }
+    flags.askedJaemin = true;
+    await say(
+      { who: ME, text: '아빠. 정재민이 누구야?' },
+      '타자를 치던 손이 멈췄다.',
+      { who: '아빠', text: '…그 이름은 어디서.' },
+      { who: ME, text: '학교 동아리 창고. 221B 활동 보고서. 부장 정재민, 기록 서준호.' },
+      { who: ME, text: '앨범에서 얼굴 파인 사람, 그 사람이지?' },
+      { who: '아빠', text: '……' },
+      { who: '아빠', text: '중학교 때부터 친구였어. 동산중, 동산고. 맨날 붙어 다녔지.' },
+      { who: '아빠', text: '추리소설 돌려 읽고, 쓸데없는 사건 쫓아다니고. …재민이가 추리하고, 아빠가 받아 적고.' },
+      { who: ME, text: '근데 왜 연락 안 해?' },
+      { who: '아빠', text: '언젠가부터 연락이 안 됐어.' },
+    );
+    // 선택: 기다릴지, 캐물을지 — 아빠의 마음
+    const patient = await choose(['아빠는 그 이상 말할 생각이 없어 보인다.'],
+      ['"…그렇구나."', '"그게 다일 리가 없잖아. 기말고사 건은 뭔데?"']) === 0;
+    if (patient) {
+      addHeart('dad', 1);
+      await say({ who: ME, text: '…그렇구나.' });
+      if (route.heart.dad >= 2) {
+        await say(
+          '한참 뒤, 아빠가 노트북을 덮었다.',
+          { who: '아빠', text: '…재민이가 떠나던 날.' },
+          { who: '아빠', text: '아빠는 배웅을 안 갔어. 못 간 게 아니라… 안 갔어.' },
+          { who: '아빠', text: '오늘은 그게 다야.' },
+        );
+      } else {
+        await say({ who: '아빠', text: '…일찍 자.' });
+      }
+    } else {
+      flags.pushedDad = true;
+      await say(
+        { who: ME, text: '그게 다일 리가 없잖아. 보고서에 "기말고사 건 조사 중"이라고 돼 있었어. 그러고 바로 전학 갔고.' },
+        { who: '아빠', text: '지후야.' },
+        { who: '아빠', text: '…그 일은 너랑 상관없어.' },
+        '아빠는 노트북을 들고 방으로 들어가 버렸다.',
+      );
+    }
+    await say('…아빠한테서는 더 들을 수 없다.', '정재민. 지금 어디 있을까. 중학교 동창이라면… 내 방에서 찾아보자.');
+  },
+
+  // 내 방 책상 (화요일 밤: 동창 밴드)
+  async myDesk() {
+    if (!flags.tueEvening || flags.wed) {
+      await say('책상 위에 수학 학습지가 펼쳐져 있다.', '…주말 내내 한 문제도 안 풀었다.');
+      return;
+    }
+    if (!flags.askedJaemin) {
+      await say('…먼저 아빠한테 물어보자.');
+      return;
+    }
+    if (flags.bandDone) return;
+    await say(
+      '휴대폰으로 검색했다. "동산중학교 95년 졸업".',
+      '…있다. 공개 밴드. "동산중 17회 졸업생 모임 — 멤버 84명"',
+      '"정재민" 검색. 결과 없음. 대신 아빠 이름이 있다. 서준호 — 가입만 하고 글은 하나도 없다.',
+      '최근에 글을 쓴 세 사람에게 메시지를 보냈다.',
+      '"안녕하세요, 갑자기 죄송합니다. 혹시 정재민 씨 연락처를 아시나요? 아버지의 친구분이라서요."',
+      '……',
+      '띠링. 김태호.',
+      '"정재민? 아, 고등학교 때 갑자기 전학 간 애. 그 뒤로는 몰라요. 근데 누구네 애예요? ㅎㅎ"',
+      '띠링. 박선영.',
+      '"재민이… 오랜만에 듣는 이름이네요. 동창회에 한 번도 안 나왔어요. 번호 아는 사람 없을 거예요. 준호는 잘 지내요?"',
+      '…한참 뒤, 밤 11시 52분. 이동욱.',
+      '"재민이 얘기는 좀 그래요. 그때 동산고에서 무슨 일 있었잖아요. 시험 때."',
+      '"그 뒤로 걔 얘기 하면 안 되는 분위기였어요. 학생도 그만 찾는 게 좋을 거예요. 좋은 일 아니에요."',
+    );
+    giveClue(BAND_CLUE);
+    flags.bandDone = true;
+    addEvidence(1);
+    await say(
+      '…아무도 모른다.',
+      '28년 동안, 아무도 그 사람을 찾지 않았다.',
+      '"그 뒤로 걔 얘기 하면 안 되는 분위기였어요."',
+      '…누가, 그런 분위기를 만든 걸까.',
+    );
+    await SCRIPTS.wedStart();
+  },
+
+  // 수요일 점심: 은비와 미신 하나
+  async wedStart() {
+    await fadeBlack();
+    await showChapter('11월 18일 수요일\n점심시간', 2.2);
+    flags.wed = true;
+    setupDay(2, CLASS_SEAT);
+    const eunbi = addActor('eunbi', 21.5, 28.2, 'down', 2);
+    await fadeInAsync();
+    await say(
+      { who: FRIEND, text: '…그래서 동창들도 아무도 모른다고?' },
+      { who: ME, text: '응. 한 명은 "시험 때 무슨 일"이 있었다면서, 그만 찾으래.' },
+      { who: FRIEND, text: '기말고사 건, 시험 때 무슨 일… 다 같은 얘기잖아.' },
+      { who: '은비', text: '너네 요즘 둘이서 뭘 그렇게 수군거려?' },
+      flags.rumorOk
+        ? { who: '은비', text: '대숲 글, 너네지? 교감쌤 방송까지 나왔잖아.' }
+        : { who: '은비', text: '창고 쪽에서 너네 봤다는 애 있던데.' },
+    );
+    const tell = await choose(['은비는 방송부다. 그리고 미신 얘기만 나오면 팩트 체크를 한다.'],
+      ['"…사실은." (다 털어놓는다)', '"미신 하나 물어보려고. 밤에 들리는 말소리."']) === 0;
+    if (tell) {
+      await say(
+        '창고, 앨범, 파인 사진, 221B, 정재민. 은비는 끝까지 한마디도 끼어들지 않았다.',
+        { who: '은비', text: '…알았어. 아무한테도 말 안 할게.' },
+        { who: '은비', text: '근데 그거 알아? 미신 하나. 밤에 그 교실에서 말소리 들린다는 거.' },
+      );
+    } else {
+      await say({ who: ME, text: '미신 하나. 밤에 그 교실에서 말소리 들린다는 거, 너 뭐 알아?' }, { who: '은비', text: '…그거 왜?' });
+    }
+    await say(
+      { who: '은비', text: '그거 방송부 전설이야. 방송실에 진짜 오래된 카세트 데크가 있거든.' },
+      { who: '은비', text: '고장 나서 가끔 혼자 돌아가. 근데 배선이 옛날 그대로라, 그 소리가 창고 교실 스피커로만 나간대.' },
+      { who: FRIEND, text: '뭐가 나오는데?' },
+      { who: '은비', text: '선배들 말로는… 옛날 점심 방송. 사연 읽어 주는 거.' },
+      { who: ME, text: '…사연.' },
+      { who: '은비', text: '방송부 자료 캐비닛에 90년대 테이프 다 있어. 열쇠는 나한테 있고.' },
+      { who: '은비', text: '점심 방송 끝났으니까… 가 볼래? 1층 방송실. 먼저 가 있을게.' },
+    );
+    await walkActor(eunbi, 24.5, 22.5, 1.0);
+    await walkActor(eunbi, 24.5, 20.5, 0.5);
+    removeActor(eunbi);
+    flags.toBroadcast = true;
+    addActor('eunbi', 57.5, 9.2, 'down', 1);
+  },
+
+  // 1층 방송실에 들어서면: 1998년 사연 테이프 → 사연 해독
+  async broadcastRoom() {
+    if (!flags.toBroadcast || flags.heardTape) return;
+    flags.heardTape = true;
+    await say(
+      { who: '은비', text: '왔어? 여기, 90년대 칸.' },
+      '은비가 캐비닛을 열었다. 라벨 붙은 카세트테이프가 빼곡하다.',
+      '"97.3 입학식", "98.5 체육대회", … "98.12 점심 — 사연".',
+      { who: '은비', text: '이거다. 데크에 늘 끼어 있던 거. 미신 하나의 범인.' },
+      '은비가 낡은 데크에 테이프를 넣었다. 철컥. 지지지직—',
+      { who: '1998년 DJ', text: '…네, 점심 맛있게 드셨나요? 오늘의 마지막 사연입니다.' },
+      { who: '1998년 DJ', text: '2학년 6반 J 학생이 보내 주셨어요. 이번 주에 전학을 간대요.' },
+      { who: '1998년 DJ', text: '"앨리스처럼 이상한 나라에 떨어진 기분이야."' },
+      { who: '1998년 DJ', text: '"범인 찾기가 내 취미였던 거, 다들 알지?"' },
+      { who: '1998년 DJ', text: '"내일이면 나는 이 학교를 떠나."' },
+      { who: '1998년 DJ', text: '"얼마 안 됐지만 정말 즐거웠어."' },
+      { who: '1998년 DJ', text: '"굴러다니던 추리소설은 동아리방에 두고 갈게."' },
+      { who: '1998년 DJ', text: '"뒤돌아보지 말라는데, 자꾸 돌아보게 되네."' },
+      { who: '1998년 DJ', text: '"그리고 J에게. 우리 첫 번째 규칙, 잊지 마." …라고 하네요. J 학생, 어디 가서든 잘 지내요!' },
+      '지지직— 노래가 흘러나오다 끊겼다.',
+      { who: FRIEND, text: '…J가 J한테. 재민이 준호한테 보낸 거네.' },
+      { who: '은비', text: '그냥 작별 인사 같은데?' },
+      { who: ME, text: '…아니. 말투가 이상해. 문장이 딱딱 끊겨. 그리고 작별 인사에 규칙 얘기는 왜 해?' },
+    );
+    giveClue(TAPE_CLUE);
+    await wait(0.3);
+    if (!await Experiment.start(EXPERIMENTS.acrostic)) return;
+    flags.decoded = true;
+    addEvidence(1);
+    await say(
+      { who: '은비', text: '…앨범 내 얼굴 뒤. 소름 돋았어.' },
+      { who: FRIEND, text: '얼굴 판 게 본인이었던 거야? 증거를 숨기려고?' },
+    );
+    if (flags.tookAlbum) {
+      await say({ who: ME, text: '앨범… 내 가방에 있어.' });
+      await SCRIPTS.findNote();
+      return;
+    }
+    await say(
+      { who: ME, text: '앨범은… 창고 사물함에 두고 왔어.' },
+      { who: FRIEND, text: '…또 가야 돼? 그 난간?' },
+      { who: '은비', text: '난간? 너네 진짜 미쳤구나.' },
+      { who: ME, text: '방과 후에. 이번엔 진짜 마지막이야.' },
+    );
+    Sound.sfx('chime');
+    await fadeBlack();
+    actors.length = 0;
+    await showChapter('같은 날, 방과 후\n오후 4시 30분', 2);
+    flags.roomAgain = true;
+    setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);   // 화장실 앞 복도
+    await fadeInAsync();
+    await say({ who: FRIEND, text: '…가자. 빨리 끝내자. 화장실 창문.' });
+  },
+
+  // 방과 후, 두 번째 난간
+  async backToRoom() {
+    await say(
+      '다시 창틀에 올라섰다.',
+      { who: FRIEND, text: '아래 안 봐. 앞만 봐. …나 스스로한테 하는 말이야.' },
+    );
+    flags.inRoom2 = true;
+    await fadeAsync(() => {
+      setFloor(2, ROOM_LAND);
+      ambient = DUST;
+    });
+    await say(
+      '창고 안. 어제와 똑같은 먼지 냄새.',
+      '…아니. 바닥이 다르다.',
+      '우리 발자국 옆에, 큰 구두 발자국이 새로 찍혀 있다. 사물함 앞까지 갔다가 돌아 나갔다.',
+      { who: FRIEND, text: '교감쌤… 또 왔다 갔어.' },
+      { who: ME, text: '…앨범이 아직 있어야 할 텐데.' },
+    );
+  },
+
+  // 파인 사진 뒤 — 쪽지 원본과 재민의 메모
+  async findNote() {
+    if (flags.inRoom2) await say('사물함 맨 끝 칸. …앨범은 그대로 있다.', '교감 선생님은 "아직 그대로인지"만 확인하고 간 거다. 사진 뒤까지는 모르고.');
+    await say(
+      '앨범을 펼쳐 파인 사진을 찾았다.',
+      '네모나게 파인 자리. 손끝으로 가장자리를 만져 봤다.',
+      '…두꺼운 대지가 두 겹이다. 파인 자리 안쪽, 겹 사이가 살짝 벌어져 있다.',
+      '그 틈으로 접힌 종이 끝이 보인다.',
+      { who: FRIEND, text: '…진짜 있어.' },
+      '조심스럽게 꺼냈다. 작은 쪽지 하나, 그리고 반으로 접힌 공책 한 장.',
+      '쪽지에는 번호와 동그라미가 깔끔한 글씨로 적혀 있다. "국어 — 1.③ 2.① 3.④ 4.② 5.⑤ …"',
+      '시험 답이다.',
+      '뒷면엔 전혀 다른, 거친 글씨. "다음 시간도 똑같이. 안 하면 알지? — 형석"',
+    );
+    giveClue(NOTE_CLUE);
+    await say(
+      '공책 종이를 펼쳤다. 보고서 규칙과 같은 글씨. 정재민의 글씨다.',
+      '"1998.12.15 2교시 국어 기말. 고형석 책상 밑에서 주움."',
+      '"답 글씨는 이수아. 수아는 협박당하고 있다."',
+      '"담임 선생님께 말씀드렸지만 덮였다. 나는 금요일에 전학 간다."',
+      '"준호야, 이걸 찾았다면— 미안하다. 너까지 휘말리게 해서."',
+      '"그리고 부탁한다. — J"',
+    );
+    giveClue(MEMO_CLUE);
+    flags.foundNote = true;
+    addEvidence(2);
+    await say(
+      { who: ME, text: '…시험 부정. 고형석이 이수아를 협박해서, 시험 중에 쪽지로 답을 받았어.' },
+      { who: ME, text: '재민 씨가 그걸 알아내서 담임한테 말했는데… 덮였어. 그리고 재민 씨만 전학 갔어.' },
+      hasClue('개교기념식 안내')
+        ? { who: FRIEND, text: '잠깐. 고형석… 1층 게시판! 금요일 기념식에서 감사패 받는 동문회장 이름이 고형석이야!' }
+        : { who: FRIEND, text: '잠깐. 고형석… 어디서 봤는데. 아! 1층 게시판. 금요일 기념식에서 감사패 받는 동문회장!' },
+      { who: ME, text: '그리고 이수아는…' },
+      { who: ME, text: '…우리 국어 선생님 이름이잖아.' },
+      { who: FRIEND, text: '……' },
+      { who: ME, text: '담임은 감독표에 있던 문병철. …지금 교감.' },
+      { who: FRIEND, text: '다 아직 이 학교에 있어. 28년 동안, 다.' },
+    );
+    if (flags.inRoom2) {
+      await say({ who: FRIEND, text: '나가자. 교감쌤 또 오기 전에. 창문!' });
+      return;
+    }
+    await SCRIPTS.rumorChoice2();
+  },
+
+  // 두 번째로 창고 창문을 나서면
+  async leaveRoom2() {
+    if (!flags.foundNote) {
+      await say({ who: FRIEND, text: '앨범! 사물함 맨 끝 칸!' });
+      return;
+    }
+    flags.leftRoom2 = true;
+    await fadeAsync(() => {
+      ambient = DUSK;
+      setFloor(2, TOILET_BACK);
+    });
+    await SCRIPTS.rumorChoice2();
+  },
+
+  // 건우: 이번엔 진짜 대숲에 올리자 — 소문 / 재민의 마음
+  async rumorChoice2() {
+    await say(
+      { who: FRIEND, text: '지후야. 이거… 이번엔 진짜 큰일이다.' },
+      { who: FRIEND, text: '금요일이 기념식이잖아. 그 전에 대숲에 올리면, 고형석은 감사패 못 받아. 교감도 끝이고.' },
+      { who: FRIEND, text: '올리자. 이건 올려야 돼.' },
+    );
+    const post = await choose(['건우 말이 틀린 건 아니다. 하지만…'],
+      ['"아직이야. 증거 없이는 말하지 않는다."', '"…그래. 올리자."']) === 1;
+    flags.rumorNote = post;
+    if (post) {
+      addRumor(2);
+      await say(
+        { who: ME, text: '…그래. 올리자. 다들 알아야 돼.' },
+        { who: FRIEND, text: '쪽지 사진이랑 메모, 이름만 가리고. 오늘 밤에 올린다.' },
+        '…가슴이 쿵쾅거린다. 잘하는 짓일까.',
+      );
+    } else {
+      addHeart('jaemin', 1);
+      await say(
+        { who: ME, text: '아직이야. 221B 규칙 둘. 증거 없이는 말하지 않는다.' },
+        { who: ME, text: '쪽지만으론 부족해. 이수아 선생님이 직접 말해 줘야 돼. 그리고… 재민 씨도 찾아야 돼.' },
+        { who: FRIEND, text: '…너 지금 좀 탐정 같았다.' },
+      );
+    }
+    await SCRIPTS.ch2End();
+  },
+
+  async ch2End() {
+    if (!flags.inRoom2) {
+      await say(
+        { who: '은비', text: '…하나만 말해 줄게. 금요일 기념식 생중계, 방송부가 맡아.' },
+        { who: '은비', text: '그냥… 알고 있으라고.' },
+      );
+    }
+    await say(
+      '…미신 셋. 얼굴 파인 사진을 본 사람은 전학 간다.',
+      '사진을 판 건 재민 씨 자신이었다. 떠나야 한다는 걸 알고, 마지막으로 숨길 자리를 만든 거다.',
+      '그리고 28년 동안, 이 쪽지는 사진 뒤에서 아빠를 기다렸다.',
+    );
+    flags.ch2Done = true;
+    await fadeBlack();
+    actors.length = 0;
+    await showChapter('2장 「사라진 얼굴」 끝', 2.4);
+    await showChapter('3장 「1998년의 시험」\n— 만드는 중 —', 2.6);
+    setupDay(2, CLASS_SEAT);
     await fadeInAsync();
   },
 
   // ───────── 건우에게 묻기 (Q) ─────────
   async friend() {
     let pages;
+    if (flags.ch2) {
+      if (flags.ch2Done) pages = [{ who: FRIEND, text: '이수아 선생님… 국어 시간에 얼굴 어떻게 보지.' }, { who: FRIEND, text: '(3장은 아직 만드는 중이다.)' }];
+      else if (flags.foundNote) pages = [{ who: FRIEND, text: '창문! 나가서 얘기하자.' }];
+      else if (flags.inRoom2) pages = [{ who: FRIEND, text: '뒤쪽 사물함 맨 끝 칸. 앨범 속 파인 사진, 그 뒤야.' }];
+      else if (flags.roomAgain) pages = [{ who: FRIEND, text: '2층 화장실 창문. …이번이 진짜 마지막이다.' }];
+      else if (flags.toBroadcast) pages = [{ who: FRIEND, text: '1층 방송실. 과학실 오른쪽 끝이야. 은비가 기다려.' }];
+      else if (flags.sawReport) pages = [{ who: FRIEND, text: '…정재민. 이름을 알았으니까, 이제 사람을 찾아야지.' }];
+      else pages = [
+        { who: FRIEND, text: '1층 동아리 창고. 행정실이랑 교무실 사이야.' },
+        { who: FRIEND, text: '안쪽 왼쪽 책장에 옛날 보고서 철이 꽂혀 있어.' },
+      ];
+      await say(...pages);
+      return;
+    }
     if (flags.leftRoom) {
       pages = [{ who: FRIEND, text: '오늘은 집에 가자. 1층 현관.' }, { who: FRIEND, text: '…너네 아빠, 그 사람 누군지 알고 계실 거야.' }];
     } else if (flags.foundAlbum) {
@@ -829,6 +1424,11 @@ const DEV_STAGES = [
   ['1장 — 창고 안', 'room'],
   ['1장 — 앨범 찾은 뒤 (교감 장면 끝)', 'album'],
   ['1장 — 월요일 저녁, 집', 'evening'],
+  ['2장 — 화요일 점심 (동아리 창고로)', 'ch2'],
+  ['2장 — 화요일 저녁, 집 (아빠)', 'tue'],
+  ['2장 — 수요일 점심 (은비)', 'wed'],
+  ['2장 — 방송실 앞 (사연 테이프·해독)', 'tape'],
+  ['2장 — 해독 후, 창고 다시 (앨범 두고 온 경우)', 'room2'],
 ];
 
 const findClue = name => { const c = CLUES.find(k => k.name === name); if (c) c.found = true; };
@@ -874,8 +1474,41 @@ function devStage(stage) {
     return;
   }
   Object.assign(flags, { leftRoom: true, mondayEvening: true });
-  ambient = EVENING;
-  setFloor('home', HOME_DOOR);
+  if (stage === 'evening') {
+    ambient = EVENING;
+    setFloor('home', HOME_DOOR);
+    return;
+  }
+  // 2장: 1장을 다 본 상태 (room2 는 앨범을 두고 온 경우)
+  Object.assign(flags, { toldDad: true, day1Done: true, ch2: true, tookAlbum: stage !== 'room2' });
+  route.heart.dad = 1;
+  ['칠판 구석의 221B', '기말고사 감독표', '1998년 달력', '책상의 J & J'].forEach(findClue);
+  if (stage === 'ch2') return setupDay(2, CLASS_SEAT);
+  flags.sawReport = REPORT_CLUE.found = true;
+  route.evidence = 3;
+  if (stage === 'tue') {
+    flags.tueEvening = true;
+    companion.visible = companion.following = false;
+    ambient = EVENING;
+    return setFloor('home', HOME_DOOR);
+  }
+  Object.assign(flags, { tueEvening: true, askedJaemin: true, bandDone: true, wed: true });
+  BAND_CLUE.found = true;
+  route.evidence = 4;
+  if (stage === 'wed') {
+    setupDay(2, CLASS_SEAT);
+    return runScript('wedStart');
+  }
+  flags.toBroadcast = true;
+  if (stage === 'tape') {
+    setupDay(1, { x: 55.5, y: 17.5, dir: 'up' });
+    addActor('eunbi', 57.5, 9.2, 'down', 1);
+    return;
+  }
+  Object.assign(flags, { heardTape: true, decoded: true, roomAgain: true });
+  TAPE_CLUE.found = true;
+  route.evidence = 5;
+  setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);
 }
 
 const onOff = v => (v ? '켬' : '끔');

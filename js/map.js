@@ -153,7 +153,9 @@ function build1F() {
   b.obj('speaker', 61, 4);
   b.obj('table', 55, 6, 4, 2, look('방송용 믹서. 버튼이 수십 개다.', '"점심 방송 — 사연 읽어드립니다 (월·수·금)"라는 이름표가 붙어 있다.'));
   b.obj('shelf', 52, 11, 3, 1, look('CD와 USB가 가지런히 꽂힌 선반.'));
-  b.obj('cabinet', 59, 11, 2, 1, look('철제 캐비닛. 문에 "방송부 자료 — 1990년대"라고 적혀 있다.', '잠겨 있다.'));
+  b.obj('cabinet', 59, 11, 2, 1, { script: 'broadcastCabinet', prompt: '조사하기' });   // 방송부 자료 — 1990년대
+  // 2장 수요일: 은비와 방송실에 들어서면 테이프 장면 (story.js)
+  b.warps.push({ x: 52, y: 4, w: 10, h: 10, script: 'broadcastRoom' });
 
   // 중앙 현관
   b.room('중앙 현관', 2, 22, 12, 10, 'hall');
@@ -176,7 +178,7 @@ function build1F() {
   // 동아리 창고 (옛 동아리 물건, 2장)
   b.room('동아리 창고', 40, 22, 12, 9, 'wood');
   b.carve(44, 20, 2, 2, 'door');
-  b.obj('bookshelf', 40, 22, 4, 1, look('없어진 동아리들의 활동 보고서 철이 꽂혀 있다.', '먼지가 너무 쌓여서 지금은 손대고 싶지 않다.'));
+  b.obj('bookshelf', 40, 22, 4, 1, { script: 'reportShelf', prompt: '조사하기' });   // 없어진 동아리 보고서 철 (2장: 221B)
   b.obj('bookshelf', 46, 22, 5, 1);
   b.obj('boxes', 40, 29);
   b.obj('boxes', 41, 29);
@@ -434,7 +436,7 @@ function buildHome() {
   b.obj('bed', 2, 4, 2, 3);
   b.dec('poster', 5, 2, 2, 2, look('별자리 포스터. 어릴 때 아빠가 붙여 준 거다.'));
   b.dec('window', 8, 2, 2, 2);
-  b.obj('tdesk', 8, 4, 2, 2, look('책상 위에 수학 학습지가 펼쳐져 있다.', '…주말 내내 한 문제도 안 풀었다.'));
+  b.obj('tdesk', 8, 4, 2, 2, { script: 'myDesk', prompt: '조사하기' });   // 2장 화요일 밤: 동창 밴드
   b.obj('wardrobe', 10, 4, 2, 1);
   b.obj('bookshelf', 2, 10, 3, 1, look('만화책 사이에 낡은 추리소설이 한 권 끼어 있다.', '"셜록 홈즈 전집 1 — 주홍색 연구". 아빠 책이다.', '첫 장에 볼펜 글씨. "준호에게 — 생일 축하한다. J"'));
   b.obj('plant', 11, 11);

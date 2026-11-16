@@ -1,6 +1,6 @@
 'use strict';
 // ─────────────────────────────────────────────
-// experiment.js — 과학실 검증 ("실험 노트" 화면)
+// experiment.js — 추리 대결 ("추리 노트" 화면, 「혜성」의 실험 노트를 고쳐 씀)
 // 누군가의 '주장'을 [관찰] [단서 제시] [실험] [반박]으로 무너뜨린다.
 //   주장의 신뢰도: 맞는 단서·성공한 실험이 깎는다. 0이 되면 [반박]으로 끝낸다.
 //   비찬의 정신력: 틀린 단서, 실패한 실험, 성급한 반박이 깎는다. 0이 되면 처음부터 다시 정리한다.
@@ -8,7 +8,7 @@
 // Experiment.start(data) 는 반박에 성공하면 true 로 끝나는 Promise.
 // ─────────────────────────────────────────────
 
-const EX_ACTIONS = ['관찰', '단서 제시', '실험', '반박'];
+const EX_ACTIONS = ['관찰', '단서 제시', '추리', '반박'];
 const MAX_MIND = 5;
 const WORD_FONT = '10px Galmuri9';
 
@@ -32,6 +32,94 @@ const EX_COLORS = {
 // init() → 상태, update(m, dt) → 끝나면 { dmg, pages, solved?, once?, miss? }, draw(g, m, ox, oy, t)
 //   miss: 실패한 시도 (정신력이 깎인다)
 const MINIGAMES = {
+  // 사연 해독: 1998년 정재민의 사연 여섯 문장에서 글자를 뽑아 숨은 말을 찾는다
+  //   읽는 방법(A/D) × 순서(W/S)를 바꾸면 뽑힌 글자가 바로 보인다. F로 확정.
+  acrostic: (() => {
+    const W = 282, H = 142;
+    const LINES = [
+      '앨리스처럼 이상한 나라에 떨어진 기분이야.',
+      '범인 찾기가 내 취미였던 거, 다들 알지?',
+      '내일이면 나는 이 학교를 떠나.',
+      '얼마 안 됐지만 정말 즐거웠어.',
+      '굴러다니던 추리소설은 동아리방에 두고 갈게.',
+      '뒤돌아보지 말라는데, 자꾸 돌아보게 되네.',
+    ];
+    const letters = s => [...s].map((ch, i) => ({ ch, i })).filter(o => /[가-힣]/.test(o.ch));
+    const RULES = [
+      { label: '문장 첫 글자', pick: s => letters(s)[0].i },
+      { label: '문장 두 번째 글자', pick: s => letters(s)[1].i },
+      { label: '문장 마지막 글자', pick: s => letters(s).at(-1).i },
+    ];
+    const ORDERS = ['위에서 아래로', '아래에서 위로'];
+    const ANSWER = { rule: 0, order: 0 };
+    const word = m => {
+      const picked = LINES.map(s => s[RULES[m.rule].pick(s)]);
+      return (m.order ? picked.reverse() : picked).join('');
+    };
+
+    return {
+      init: () => ({ rule: 1, order: 1, t: 0 }),
+
+      update(m, dt) {
+        m.t += dt;
+        const dr = (tapped.has('right') ? 1 : 0) - (tapped.has('left') ? 1 : 0);
+        const dO = (tapped.has('down') ? 1 : 0) - (tapped.has('up') ? 1 : 0);
+        if (dr) {
+          m.rule = (m.rule + dr + RULES.length) % RULES.length;
+          Sound.sfx('move');
+        }
+        if (dO) {
+          m.order = (m.order + dO + ORDERS.length) % ORDERS.length;
+          Sound.sfx('move');
+        }
+        if (m.t > 0.3 && tapped.has('interact')) {
+          if (m.rule === ANSWER.rule && m.order === ANSWER.order) {
+            return {
+              dmg: 50, solved: true,
+              pages: [
+                '여섯 문장의 첫 글자를 위에서부터 이었다.',
+                '앨. 범. 내. 얼. 굴. 뒤.',
+                { who: ME, text: '"앨범 내 얼굴 뒤."' },
+                { who: ME, text: '그냥 작별 인사가 아니었어. 정재민 씨는 아빠한테 길을 알려 준 거야.' },
+                '사연의 신뢰도가 크게 무너졌다!',
+              ],
+            };
+          }
+          return { dmg: 0, miss: true, pages: [`"${word(m)}"…`, '아무 뜻도 없다. 다른 방법으로 읽어 보자.'] };
+        }
+        return null;
+      },
+
+      draw(g, m, ox, oy, t) {
+        rect(g, ox, oy, W, H, '#f4efe2');
+        for (let y = oy + 24; y < oy + H; y += 13) rect(g, ox + 4, y + 9, W - 8, 1, '#d8d0bc');
+        rect(g, ox + 14, oy, 1, H, '#e0a0a0');
+        g.font = WORD_FONT;
+        g.textBaseline = 'middle';
+        g.fillStyle = '#7a6a5a';
+        g.fillText('1998. 12. 16 점심 방송 — 2학년 6반 J의 사연', ox + 20, oy + 10);
+        LINES.forEach((s, li) => {
+          const y = oy + 30 + li * 13, at = RULES[m.rule].pick(s);
+          let x = ox + 20;
+          [...s].forEach((ch, i) => {
+            const w = g.measureText(ch).width;
+            if (i === at) rect(g, Math.round(x) - 1, y - 6, Math.ceil(w) + 2, 12, '#ffe066');
+            g.fillStyle = i === at ? '#b8323f' : '#2a2a30';
+            g.fillText(ch, x, y);
+            x += w;
+          });
+        });
+        // 뽑힌 글자 + 읽는 방법
+        rect(g, ox + 4, oy + H - 30, W - 8, 26, '#0e1420');
+        g.fillStyle = '#8fa6c8';
+        g.fillText(`◂ ${RULES[m.rule].label} ▸   ▴ ${ORDERS[m.order]} ▾`, ox + 10, oy + H - 23);
+        g.fillStyle = '#ffe066';
+        g.fillText(`→ "${[...word(m)].join(' ')}"`, ox + 10, oy + H - 10);
+        if (Math.floor(t * 2) % 2) rect(g, ox + W - 14, oy + H - 14, 4, 4, '#ffe066');
+      },
+    };
+  })(),
+
   // 연소 실험: 열원을 놓고 불을 붙여서, 벽에 남은 V자 그을음과 겹치는 자리를 찾는다
   combustion: (() => {
     const W = 282, H = 142, FLOOR = 128;
@@ -809,7 +897,7 @@ const Experiment = (() => {
         textEl.append(line);
       });
     } else if (st.mode === 'menu') {
-      setText(textEl, ['주장을 자세히 살펴본다.', '수첩의 단서를 들이민다.', '과학실에서 직접 확인한다.', '주장을 정면으로 무너뜨린다.'][st.menu]);
+      setText(textEl, ['주장을 자세히 살펴본다.', '수첩의 단서를 들이민다.', '단서를 맞춰 직접 풀어 본다.', '주장을 정면으로 무너뜨린다.'][st.menu]);
     } else {
       setText(textEl, '');
     }
@@ -866,6 +954,12 @@ const Experiment = (() => {
     } else if (d.prop === 'lamp') {
       rect(g, P.x + 30 + sx, P.y + 30, 8, 8, '#bfe3ef');
       rect(g, P.x + 33 + sx, P.y + 25 - (Math.floor(t * 8) % 2), 2, 5, '#ff8a2a');
+    } else if (d.prop === 'tape') {
+      // 카세트테이프를 든 손
+      rect(g, P.x + 24 + sx, P.y + 32, 16, 10, '#2a2a30');
+      rect(g, P.x + 26 + sx, P.y + 33, 12, 4, '#e8e2cc');
+      rect(g, P.x + 28 + sx, P.y + 38, 2, 2, '#8a8a92');
+      rect(g, P.x + 34 + sx, P.y + 38, 2, 2, '#8a8a92');
     }
     if (st.cred <= 40) rect(g, P.x + 38, P.y + 12 + (Math.floor(t * 3) % 2) * 2, 2, 3, '#6fc3ff');   // 식은땀
     if (st.flash > 0 && Math.floor(t * 20) % 2 === 0) {

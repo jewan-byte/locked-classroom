@@ -61,14 +61,13 @@ const Save = (() => {
     Object.assign(route, JSON.parse(JSON.stringify(s.route)));
     for (const c of CLUES) c.found = s.clues.includes(c.name);
 
-    const inStoreroom = flags.inRoom && !flags.leftRoom;
-    ambient = flags.mondayEvening ? EVENING
-      : inStoreroom ? DUST
-        : flags.afterSchool ? DUSK : null;
+    ambient = sceneAmbient();
     setFloor(s.floor, { x: s.x / TILE, y: s.y / TILE, dir: s.dir });
     // 건우는 저장 당시 자리 그대로, 따라오는 길(trail)만 그 자리에서 다시 시작
     Object.assign(companion, s.companion);
     trail = [{ x: companion.x, y: companion.y }, { x: player.x, y: player.y }];
+    // 수요일 점심: 방송실에서 기다리는 은비
+    if (flags.toBroadcast && !flags.heardTape) addActor('eunbi', 57.5, 9.2, 'down', 1);
     last = JSON.stringify({ ...snapshot(), savedAt: 0 });
   }
 
