@@ -659,6 +659,19 @@ function ch2Doing() {
   return '1층 동아리 창고에서 1998년 기록 찾기';
 }
 
+// 지금 장면에 맞는 배경음악 (main.js 가 매 프레임 묻는다 — audio.js 가 바뀔 때만 넘어간다)
+function musicTrack() {
+  if (titleEl.classList.contains('show')) return 'mystery';
+  if (Experiment.isOpen) return 'tension';
+  if (flags.ending) return 'home';
+  if (flags.memory) return 'memory';
+  const here = floor.map.n;
+  if (here === 'home') return ambient === EVENING ? 'home' : 'day';
+  if (flags.ch4 && here === 1) return 'ceremony';
+  if (ambient === DUST || ambient === DUSK) return 'mystery';
+  return 'day';
+}
+
 // 단서를 새로 찾을 때마다 (대사가 끝난 뒤)
 function onClueFound() {}
 

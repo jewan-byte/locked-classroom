@@ -867,6 +867,7 @@ function loop(now) {
   const dt = Math.min(real, 1 / 30);
   last = now;
   Controls.update(dt);
+  Sound.setTrack(musicTrack());   // 장면이 바뀌면 배경음악도 (story.js)
   update(dt);
   tapped.clear();
   draw();
