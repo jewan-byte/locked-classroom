@@ -152,7 +152,16 @@ function build1F() {
 
   // 작은 방들 사이로 이어지는 넓은 복도 + 아래쪽 복도 (y29~32)
   b.carve(2, 20, 10, 9, 'hall');
-  b.carve(48, 20, 42, 9, 'hall');
+  b.carve(58, 20, 20, 9, 'hall');
+  // 홀 양옆: 보건실, 매점
+  southRoom(b, '보건실', 48, 22, 8, 5, 'lab', 50);
+  b.obj('bed', 48, 22, 2, 3, look('보건실 침대. 하얀 커튼이 반쯤 쳐져 있다.'));
+  b.obj('cabinet', 54, 22, 2, 1, look('약품장. "두통약, 소화제, 밴드 — 필요하면 선생님께"'));
+  b.obj('tdesk', 52, 24, 2, 2);
+  southRoom(b, '매점', 80, 22, 10, 5, 'lab', 84);
+  b.obj('counter', 80, 22, 4, 1, look('매점 계산대. 빵 진열대가 텅 비었다. 점심시간이 지났나 보다.'));
+  b.obj('fridge', 87, 22, 2, 1, look('음료 냉장고. 바나나우유만 잔뜩 남아 있다.'));
+  b.obj('shelf', 85, 25, 3, 1);
   b.carve(102, 20, 8, 9, 'hall');
   b.room('1층 복도', 2, 29, 108, 4, 'hall');
   b.regions.push({ name: '1층 복도', x: 2, y: 20, w: 108, h: 9 });
@@ -276,9 +285,34 @@ function build2F() {
   // 전산실 (통제구역), 영어교과교실2
   southRoom(b, '전산실', 16, 22, 12, 9, 'lab', 20);
   b.obj('padlock', 20, 20, 2, 2, look('"전산실 — ※통제구역※ 관계자 외 출입 금지"'));
+  // 음악실
+  southRoom(b, '음악실', 2, 22, 12, 9, 'wood', 10);
+  b.dec('staffboard', 3, 21, 6, 1);
+  b.obj('piano', 2, 23, 3, 2, look('업라이트 피아노. 건반 몇 개가 누렇게 바랬다.'));
+  b.obj('drums', 11, 23, 2, 2);
+  b.obj('xylophone', 6, 28, 2, 1);
+  b.obj('guitar', 13, 29);
+  for (const sx of [5, 7, 9, 11]) b.obj('stool', sx, 26);
+  // 상담실
+  southRoom(b, '상담실', 29, 22, 4, 9, 'carpet', 30);
+  b.obj('sofa', 29, 27, 4, 1, look('푹신한 소파. "편하게 앉아서 이야기해요"라는 쪽지가 붙어 있다.'));
+  b.obj('plant', 32, 22);
   southRoom(b, '영어교과교실2', 34, 22, 14, 9, 'wood', 38);
   b.dec('blackboard', 41, 21, 6, 1, look('칠판. "Today\'s expression — Long time no see."'));
   for (const cx of [36, 39, 42, 45]) for (const cy of [24, 27]) b.obj('desk', cx, cy, 1, 2);
+
+  // 도서실, 시청각실
+  southRoom(b, '도서실', 49, 22, 14, 9, 'carpet', 55);
+  for (const by of [22, 25, 28]) {
+    b.obj('bookshelf', 49, by, 5, 1, by === 22 ? look('"이달의 추천 도서 — 셜록 홈즈의 모험"', '누군가 대출 카드에 "221B"라고 낙서해 놓았다.') : {});
+    b.obj('bookshelf', 58, by, 5, 1);
+  }
+  b.obj('table', 54, 29, 3, 2);
+  southRoom(b, '시청각실', 65, 22, 11, 9, 'carpet', 69);
+  b.dec('whiteboard', 66, 21, 3, 1);
+  b.obj('speaker', 65, 22);
+  b.obj('speaker', 75, 22);
+  for (const ty of [25, 28]) b.obj('table', 66, ty, 9, 1);
 
   // 잠긴 교실 — 지금은 '창고'. 1998년의 2학년 6반 교실 (우리 반 바로 앞, 화장실 옆)
   b.room('창고', 78, 22, 12, 9, 'wood');
@@ -321,6 +355,12 @@ function build2F() {
   b.obj('stall', 92, 25, 2, 2);
   b.obj('sink', 97, 28, 2, 1);
 
+  // 동아리실 (2-7 앞)
+  southRoom(b, '동아리실', 102, 22, 8, 9, 'wood', 104);
+  b.obj('table', 103, 25, 4, 2, look('동아리 탁자. 로봇부 부품과 밴드부 악보가 뒤섞여 있다.'));
+  b.obj('boxes', 108, 22);
+  b.obj('boxes', 108, 30);
+
   return finishFloor(b);
 }
 
@@ -341,6 +381,33 @@ function build3F() {
   b.obj('table', 73, 7, 3, 2, look('3D 프린터와 로봇 부품이 흩어져 있다.'));
   b.obj('table', 76, 10, 3, 2);
   b.dec('clock', 52, 15);
+
+  // 가사실
+  southRoom(b, '가사실', 2, 22, 10, 9, 'lab', 6);
+  b.obj('counter', 2, 22, 4, 1, look('조리대. "가정 실습 — 다음 주: 김치볶음밥"'));
+  b.obj('fridge', 9, 22, 2, 1);
+  b.obj('dining', 4, 26, 3, 2);
+  b.obj('dining', 8, 26, 3, 2);
+  // 체력단련실, 자습실, 문서보관실
+  southRoom(b, '체력단련실', 40, 22, 14, 9, 'gym', 46);
+  b.obj('gymmat', 41, 24, 2, 1);
+  b.obj('gymmat', 41, 26, 2, 1);
+  b.obj('vault', 46, 26, 2, 1);
+  b.obj('ballcart', 52, 23);
+  southRoom(b, '자습실', 56, 22, 16, 9, 'carpet', 62);
+  for (const tx of [57, 60, 63, 66, 69]) {
+    b.obj('studydesk', tx, 24, 2, 2);
+    b.obj('studydesk', tx, 27, 2, 2);
+  }
+  southRoom(b, '문서보관실', 74, 22, 16, 9, 'carpet', 80);
+  for (const by of [22, 25, 28]) b.obj('bookshelf', 75, by, 6, 1, by === 22 ? look('졸업앨범이 연도순으로 꽂혀 있다.', '…1998년 2학년 6반의 학급 앨범만 없다. 창고에 있었으니까.') : {});
+  b.obj('cabinet', 84, 22, 2, 1);
+  b.obj('boxes', 88, 29);
+  // 학생 휴게실 (3-7 앞)
+  southRoom(b, '학생 휴게실', 102, 22, 8, 9, 'carpet', 104);
+  b.obj('sofa', 103, 27, 4, 1);
+  b.obj('fountain', 108, 22);
+  b.obj('plant', 102, 22);
 
   // 3층 옥상 (야외교실)
   b.room('3층 옥상 (야외교실)', 14, 22, 24, 9, 'path');
