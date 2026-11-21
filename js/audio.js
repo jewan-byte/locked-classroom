@@ -59,6 +59,15 @@ const Sound = (() => {
   //   arp(반주 무늬: 0~2 = 코드 음, 3 = 근음 옥타브 위, null = 쉼), arpVol, bass(무늬: 'r' 근음, '5' 5도, 'o' 옥타브, '.' 쉼),
   //   drums(8칸: k 킥, s 스네어, h 하이햇, '.' 쉼, 마디마다 반복), pad(코드를 길게 깔기), box(오르골)
   const TRACKS = {
+    // 처음 곡 (원래 배경음): 타이틀부터 1장 방과 후 노을 전까지. 쓸쓸한 Am - F - Dm - E, 8마디 반복
+    original: {
+      bpm: 84, legacy: true,
+      chords: ['Am', 'F', 'Dm', 'E'],
+      melody: ['E5 . C5 . D5 C5 B4 .', 'C5 . . A4 C5 . F5 .', 'E5 . D5 . C5 . A4 .', 'B4 . G#4 . B4 D5 E5 .'],
+      arp: [0, 1, 2, 3, 2, 1, 2, 1],
+      bass: '. . . . . . . .',
+      drums: '',
+    },
     // 학교의 낮: 가볍게 통통 튀는 C장조
     day: {
       bpm: 100, lead: 'square', leadVol: 0.03, arpVol: 0.035,
@@ -146,7 +155,7 @@ const Sound = (() => {
     t.drumCells = t.drums ? t.drums.split(/\s+/) : null;
   }
 
-  let track = TRACKS.mystery, trackName = 'mystery', wantTrack = 'mystery', switchAt = 0;
+  let track = TRACKS.original, trackName = 'original', wantTrack = 'original', switchAt = 0;
   let step = 0, nextTime = 0, musicBus = null, leadBus = null, noiseBuf = null;
 
   // 북소리: 킥(내려가는 사인), 스네어·하이햇(잡음)
@@ -193,6 +202,17 @@ const Sound = (() => {
     while (nextTime < ctx.currentTime + 0.25) {
       const b = Math.floor(step / 8) % track.chords.length, beat = step % 8;
       const chord = track.chordNotes[b];
+      // 원래 곡은 예전 방식 그대로 (반주는 제 옥타브, 멜로디는 앞 4마디만, 근음 베이스 두 번)
+      if (track.legacy) {
+        const bar8 = Math.floor(step / 8) % 8, li = track.arp[beat];
+        note('triangle', li === 3 ? chord[0] + 12 : chord[li], nextTime, eighth * 1.6, 0.05, musicBus);
+        if (beat === 0 || beat === 4) note('triangle', chord[0] - 12, nextTime, eighth * 3.5, 0.08, musicBus);
+        const ln = bar8 < 4 ? track.bars[bar8][beat] : null;
+        if (ln) note('square', ln.midi, nextTime, eighth * 1.8, 0.035, leadBus);
+        step++;
+        nextTime += eighth;
+        continue;
+      }
       // 반주
       const i = track.arp[beat];
       if (i !== null && i !== undefined) {

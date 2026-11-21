@@ -661,7 +661,8 @@ function ch2Doing() {
 
 // 지금 장면에 맞는 배경음악 (main.js 가 매 프레임 묻는다 — audio.js 가 바뀔 때만 넘어간다)
 function musicTrack() {
-  if (titleEl.classList.contains('show')) return 'mystery';
+  // 완전 처음(타이틀)부터 1장 방과 후 노을 전까지는 원래 곡
+  if (titleEl.classList.contains('show') || !flags.afterSchool) return 'original';
   if (Experiment.isOpen) return 'tension';
   if (flags.ending) return 'home';
   if (flags.memory) return 'memory';
