@@ -142,6 +142,10 @@ body {
   gap: calc(var(--s) * 14px);
 }
 #dialog-choices .picked { color: #ffd84a; }
+/* 선택지가 막 나타난 순간엔 아직 고를 수 없다 (연타로 넘기다 실수로 고르지 않게) */
+#dialog-choices.locked { opacity: 0.45; }
+/* 대사 속 중요한 낱말: 굵게 + 다른 색 */
+#dialog-text b { font-weight: bold; color: #ffb84a; }
 
 #dialog-next {
   position: absolute;
@@ -330,7 +334,13 @@ body {
   gap: calc(var(--s) * 24px);
 }
 #title.show { display: flex; }
-#title .tt-name { font-size: calc(var(--s) * 18px); letter-spacing: 0.08em; }
+#title .tt-name { font-size: calc(var(--s) * 26px); letter-spacing: 0.14em; }
+#title .tt-sub {
+  font-size: calc(var(--s) * 11px);
+  letter-spacing: 0.3em;
+  color: #ffb84a;
+  margin-top: calc(var(--s) * -16px);
+}
 #title .tt-press {
   font-size: calc(var(--s) * 8px);
   color: #aaa;

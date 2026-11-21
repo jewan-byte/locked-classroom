@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────
 
 const Save = (() => {
-  const KEY = 'locked-classroom.save.v1';   // 「혜성이 지나갔던 밤에」 저장과 섞이지 않게
+  const KEY = 'locked-classroom.save.v2';   // v2: 이름·연도가 바뀌어 예전 저장과 단서 이름이 맞지 않는다   // 「혜성이 지나갔던 밤에」 저장과 섞이지 않게
   let last = '';
 
   const calm = () => !cutscene && !dialog.pages && !Experiment.isOpen && !fade.dir && fade.alpha === 0
@@ -58,12 +58,13 @@ const Save = (() => {
   function restore(s) {
     resetFlags();
     Object.assign(flags, s.flags);
+    syncDad();
     Object.assign(route, JSON.parse(JSON.stringify(s.route)));
     for (const c of CLUES) c.found = s.clues.includes(c.name);
 
     ambient = sceneAmbient();
     setFloor(s.floor, { x: s.x / TILE, y: s.y / TILE, dir: s.dir });
-    // 건우는 저장 당시 자리 그대로, 따라오는 길(trail)만 그 자리에서 다시 시작
+    // 상욱이는 저장 당시 자리 그대로, 따라오는 길(trail)만 그 자리에서 다시 시작
     Object.assign(companion, s.companion);
     trail = [{ x: companion.x, y: companion.y }, { x: player.x, y: player.y }];
     // 수요일 점심: 방송실에서 기다리는 은비

@@ -96,7 +96,7 @@ const Sound = (() => {
       bass: 'r - - - 5 - - -',
       drums: 'k . . . . . h .',
     },
-    // 기억 속 1998년: 낡은 오르골
+    // 기억 속 2026년: 낡은 오르골
     memory: {
       bpm: 72, lead: 'sine', leadVol: 0.05, arpVol: 0.03, box: true,
       chords: ['Dm', 'Bb', 'F', 'C', 'Dm', 'Bb', 'Gm', 'A'],

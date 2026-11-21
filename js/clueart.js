@@ -44,20 +44,13 @@ const CLUE_ART = {
     rect(g, 25, 21, 5, 3, '#f0d870');
   },
 
-  '칠판 구석의 221B'(g) {
+  '칠판 구석의 글씨'(g) {
     rect(g, 0, 0, CLUE_W, CLUE_H, '#73532f');
     rect(g, 2, 2, 36, 26, '#2f5b47');
     for (let i = 0; i < 6; i++) rect(g, 4 + i * 4, 6 + (i % 3) * 3, 3, 1, 'rgba(188,211,197,0.25)');   // 지운 자국
-    pixelDigit(g, 2, 15, 15, '#f0f0f0');
-    pixelDigit(g, 2, 19, 15, '#f0f0f0');
-    pixelDigit(g, 1, 23, 15, '#f0f0f0');
-    // B
-    rect(g, 28, 15, 1, 5, '#f0f0f0');
-    rect(g, 29, 15, 2, 1, '#f0f0f0');
-    rect(g, 29, 17, 2, 1, '#f0f0f0');
-    rect(g, 29, 19, 2, 1, '#f0f0f0');
-    rect(g, 31, 16, 1, 1, '#f0f0f0');
-    rect(g, 31, 18, 1, 1, '#f0f0f0');
+    // 구석에 남은 글씨 "미스터리 추리동아리" (두 줄, 글자 덩어리로)
+    for (let i = 0; i < 4; i++) { rect(g, 15 + i * 5, 14, 3, 1, '#f0f0f0'); rect(g, 15 + i * 5, 15, 1, 3, '#f0f0f0'); rect(g, 17 + i * 5, 16, 1, 2, '#f0f0f0'); }
+    for (let i = 0; i < 5; i++) { rect(g, 13 + i * 5, 21, 3, 1, '#f0f0f0'); rect(g, 14 + i * 5, 22, 1, 3, '#f0f0f0'); rect(g, 13 + i * 5, 24, 3, 1, '#f0f0f0'); }
   },
 
   '기말고사 감독표'(g) {
@@ -69,7 +62,7 @@ const CLUE_ART = {
     for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) if ((r + c) % 3) rect(g, 14 + c * 6, 12 + r * 4, 3, 1, '#b8323f');
   },
 
-  '1998년 달력'(g) {
+  '2026년 달력'(g) {
     rect(g, 0, 0, CLUE_W, CLUE_H, '#3a3440');
     rect(g, 9, 3, 22, 25, '#e8e0cc');
     rect(g, 9, 3, 22, 6, '#b8323f');
@@ -118,7 +111,7 @@ const CLUE_ART = {
     rect(g, 9, 16, 22, 1, '#d8d0bc');
   },
 
-  '221B 활동 보고서'(g) {
+  '추리동아리 활동 보고서'(g) {
     rect(g, 0, 0, CLUE_W, CLUE_H, '#2a2230');
     rect(g, 6, 2, 28, 26, '#e8e0cc');
     rect(g, 6, 2, 28, 4, '#4a6a3a');
@@ -140,7 +133,7 @@ const CLUE_ART = {
     rect(g, 14, 19, 8, 1, '#8a2a2a');
   },
 
-  '사연 테이프'(g) {
+  '사연 녹음'(g) {
     rect(g, 0, 0, CLUE_W, CLUE_H, '#2a2230');
     rect(g, 5, 6, 30, 19, '#2a2a30');
     rect(g, 7, 8, 26, 8, '#e8e2cc');

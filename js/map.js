@@ -1,6 +1,6 @@
 'use strict';
 // ─────────────────────────────────────────────
-// map.js — 동산고 1~3층과 운동장, 지후네 집, 등굣길 버스
+// map.js — 대전동산중 1~3층과 운동장, 지후네 집, 등굣길 버스
 // 좌표는 모두 타일 단위. 실내 방을 파내면(carve) 주변 벽은 자동으로 생긴다.
 // obj/dec 마지막 인자로 clue(이름, 대사...)를 넘긴 것만 조사(F)할 수 있고, 조사하면 단서 수첩에 기록된다.
 //
@@ -133,8 +133,8 @@ function build1F() {
   b.obj('bookshelf', 76, 4, 4, 1, look('수업 자료 상자가 빼곡하다.'));
 
   b.dec('bulletin', 57, 15, 3, 1, clue('개교기념식 안내',
-    '게시판. "개교 52주년 기념식 — 11월 20일(금) 오전 10시, 체육관"',
-    '그 아래 작은 글씨. "동문회장 고형석 님(2000년 졸업) 감사패 전달"'));
+    '게시판. "개교 82주년 기념식 — 11월 17일(금) 오전 10시, 체육관"',
+    '그 아래 작은 글씨. "동문회장 허진 님(2028년 졸업) 감사패 전달"'));
   b.dec('bulletin', 12, 15, 3, 1, look('동아리 홍보 포스터. 밴드부, 로봇부, 방송부…', '추리 동아리 같은 건 없다.'));
   b.obj('fountain', 70, 16);
 
@@ -142,7 +142,7 @@ function build1F() {
   southRoom(b, '여직원 화장실', 14, 22, 6, 5, 'lab', 16);
   southRoom(b, '남직원 화장실', 21, 22, 6, 5, 'lab', 23);
   southRoom(b, '자료실', 28, 22, 4, 5, 'carpet', 29);
-  b.obj('bookshelf', 28, 22, 4, 1, { script: 'reportShelf', prompt: '조사하기' });   // 없어진 동아리 보고서 철 (2장: 221B)
+  b.obj('bookshelf', 28, 22, 4, 1, { script: 'reportShelf', prompt: '조사하기' });   // 없어진 동아리 보고서 철 (2장: 미스터리 추리동아리)
   b.obj('boxes', 31, 26);
   southRoom(b, '협의회실', 33, 22, 13, 5, 'carpet', 38);
   b.obj('table', 36, 23, 6, 2);
@@ -195,13 +195,13 @@ function build1F() {
   b.obj('shoelocker', 54, 40, 4, 1);
   b.obj('shoelocker', 62, 40, 4, 1);
   b.dec('mat', 58, 42, 4, 2);
-  // 방송실 (2장: 옛 사연 테이프)
+  // 방송실 (2장: 옛 사연 녹음)
   southRoom(b, '방송실', 68, 35, 8, 9, 'carpet', 70);
   b.obj('speaker', 68, 35);
   b.obj('speaker', 75, 35);
   b.obj('table', 70, 37, 4, 2, look('방송용 믹서. 버튼이 수십 개다.', '"점심 방송 — 사연 읽어드립니다 (월·수·금)"라는 이름표가 붙어 있다.'));
   b.obj('shelf', 68, 42, 3, 1, look('CD와 USB가 가지런히 꽂힌 선반.'));
-  b.obj('cabinet', 73, 42, 2, 1, { script: 'broadcastCabinet', prompt: '조사하기' });   // 방송부 자료 — 1990년대
+  b.obj('cabinet', 73, 42, 2, 1, { script: 'broadcastCabinet', prompt: '조사하기' });   // 방송부 자료 — 2020년대
   b.warps.push({ x: 68, y: 35, w: 8, h: 9, script: 'broadcastRoom' });   // 2장 수요일 (story.js)
   southRoom(b, '수학탐구실', 78, 35, 14, 9, 'wood', 80);
   b.obj('table', 81, 38, 4, 2);
@@ -249,10 +249,10 @@ function build1F() {
   b.obj('ballcart', 110, 57);
   b.obj('gymmat', 110, 65, 2, 1);
   b.obj('gymmat', 110, 67, 2, 1);
-  b.dec('banner', 96, 53, 6, 2, look('현수막. "개교 52주년 기념식 — 자랑스러운 동산인"'));
+  b.dec('banner', 96, 53, 6, 2, look('현수막. "개교 82주년 기념식 — 자랑스러운 동산인"'));
   b.obj('stage', 95, 57, 8, 2);
-  b.obj('podium', 92, 59, 2, 1, { script: 'guestbook', prompt: '방명록 보기' });   // 기념식 방명록 (3장: 고형석의 글씨)
-  b.obj('trophycase', 105, 58, 3, 1, look('기념식 때 쓸 감사패들이 진열돼 있다.', '맨 앞 감사패. "고형석 동문회장님 — 모교 발전 기금 5억 원"'));
+  b.obj('podium', 92, 59, 2, 1, { script: 'guestbook', prompt: '방명록 보기' });   // 기념식 방명록 (3장: 허진의 글씨)
+  b.obj('trophycase', 105, 58, 3, 1, look('기념식 때 쓸 감사패들이 진열돼 있다.', '맨 앞 감사패. "허진 동문회장님 — 모교 발전 기금 5억 원"'));
 
   return finishFloor(b);
 }
@@ -278,9 +278,9 @@ function build2F() {
 
   // 2학년 6반 (지후네 반)
   const six = SLOT(9);
-  b.objects.find(o => o.type === 'podium' && o.x === six + 3).text = ['교탁. 출석부 위에 "11/20 개교기념식 — 2학년은 합창"이라는 쪽지가 붙어 있다.'];
+  b.objects.find(o => o.type === 'podium' && o.x === six + 3).text = ['교탁. 출석부 위에 "11/17 개교기념식 — 2학년은 합창"이라는 쪽지가 붙어 있다.'];
   Object.assign(b.objects.find(o => o.type === 'desk' && o.x === six + 2 && o.y === 11), look('내 자리. 책상 서랍에 구겨진 수학 학습지가 들어 있다.'));
-  Object.assign(b.objects.find(o => o.type === 'desk' && o.x === six + 5 && o.y === 11), look('건우 자리. 책상 위에 "잠긴 교실 7대 미신"이라고 낙서돼 있다.', '…7개나 되나?'));
+  Object.assign(b.objects.find(o => o.type === 'desk' && o.x === six + 5 && o.y === 11), look('상욱이 자리. 책상 위에 "잠긴 교실 7대 미신"이라고 낙서돼 있다.', '…7개나 되나?'));
 
   // 전산실 (통제구역), 영어교과교실2
   southRoom(b, '전산실', 16, 22, 12, 9, 'lab', 20);
@@ -304,7 +304,7 @@ function build2F() {
   // 도서실, 시청각실
   southRoom(b, '도서실', 49, 22, 14, 9, 'carpet', 55);
   for (const by of [22, 25, 28]) {
-    b.obj('bookshelf', 49, by, 5, 1, by === 22 ? look('"이달의 추천 도서 — 셜록 홈즈의 모험"', '누군가 대출 카드에 "221B"라고 낙서해 놓았다.') : {});
+    b.obj('bookshelf', 49, by, 5, 1, by === 22 ? look('"이달의 추천 도서 — 셜록 홈즈의 모험"', '누군가 대출 카드에 "미스터리 추리동아리"라고 낙서해 놓았다.') : {});
     b.obj('bookshelf', 58, by, 5, 1);
   }
   b.obj('table', 54, 29, 3, 2);
@@ -314,31 +314,31 @@ function build2F() {
   b.obj('speaker', 75, 22);
   for (const ty of [25, 28]) b.obj('table', 66, ty, 9, 1);
 
-  // 잠긴 교실 — 지금은 '창고'. 1998년의 2학년 6반 교실 (우리 반 바로 앞, 화장실 옆)
+  // 잠긴 교실 — 지금은 '창고'. 2026년의 2학년 6반 교실 (우리 반 바로 앞, 화장실 옆)
   b.room('창고', 78, 22, 12, 9, 'wood');
   b.carve(88, 20, 2, 2, 'door');
   b.obj('padlock', 88, 20, 2, 2, { script: 'lockedDoor', prompt: '살펴보기' });
   // 밖에서는 안이 안 보이게 어둡게 (안에 들어가야 보인다). 자물쇠 달린 문(88~89)은 빼고 위쪽 벽면까지
   b.regions.find(r => r.name === '창고').dark = [[78, 20, 10, 2], [78, 22, 12, 9]];
   b.dec('dustyWindow', 78, 20, 2, 2, { script: 'roomWindow', prompt: '창문으로 나가기' });
-  b.dec('blackboard', 80, 21, 6, 1, clue('칠판 구석의 221B',
+  b.dec('blackboard', 80, 21, 6, 1, clue('칠판 구석의 글씨',
     '칠판은 거의 다 지워져 있다.',
-    '오른쪽 구석에만 유성 매직으로 쓴 글씨가 남아 있다. "221B"',
+    '오른쪽 구석에만 유성 매직으로 쓴 글씨가 남아 있다. "미스터리 추리동아리"',
     '아무리 문질러도 안 지워진다. "칠판 글씨가 안 지워진다"는 미신… 이거였나.'));
-  b.dec('calendar', 86, 21, 1, 1, clue('1998년 달력',
-    '벽에 걸린 달력. "1998년 12월"',
+  b.dec('calendar', 86, 21, 1, 1, clue('2026년 달력',
+    '벽에 걸린 달력. "2026년 12월"',
     '18일에 빨간 동그라미. 그 옆에 볼펜 글씨. "J 마지막 날"',
     '그 뒤로는 한 장도 넘겨지지 않았다.'));
   b.dec('chart', 87, 21, 1, 1, clue('기말고사 감독표',
-    '벽에 붙은 표. "1998학년도 2학기 기말고사 감독 배정 — 2학년 6반"',
-    '12월 14일부터 17일까지. 감독 칸 대부분에 같은 이름이 적혀 있다. "담임 문병철"',
-    '…문병철? 어디서 들어 본 이름인데.'));
+    '벽에 붙은 표. "2026학년도 2학기 기말고사 감독 배정 — 2학년 6반"',
+    '12월 14일부터 17일까지. 감독 칸 대부분에 같은 이름이 적혀 있다. "담임 권도윤"',
+    '…권도윤? 어디서 들어 본 이름인데.'));
   b.obj('stackdesk', 80, 23, 2, 1);
   b.obj('stackdesk', 83, 23, 2, 1);
   b.obj('stackdesk', 87, 27, 2, 1);
   b.obj('desk', 85, 25, 1, 2, clue('책상의 J & J',
     '먼지 쌓인 책상. 상판에 칼로 새긴 글자가 있다.',
-    '"J & J — 221B 영원히"',
+    '"J & J — 추리동아리 영원히"',
     'J랑 J… 누구 이니셜이지?'));
   b.obj('desk', 82, 26, 1, 2);
   b.obj('desk', 80, 27, 1, 2);
@@ -400,7 +400,7 @@ function build3F() {
     b.obj('studydesk', tx, 27, 2, 2);
   }
   southRoom(b, '문서보관실', 74, 22, 16, 9, 'carpet', 80);
-  for (const by of [22, 25, 28]) b.obj('bookshelf', 75, by, 6, 1, by === 22 ? look('졸업앨범이 연도순으로 꽂혀 있다.', '…1998년 2학년 6반의 학급 앨범만 없다. 창고에 있었으니까.') : {});
+  for (const by of [22, 25, 28]) b.obj('bookshelf', 75, by, 6, 1, by === 22 ? look('졸업앨범이 연도순으로 꽂혀 있다.', '…2026년 2학년 6반의 학급 앨범만 없다. 창고에 있었으니까.') : {});
   b.obj('cabinet', 84, 22, 2, 1);
   b.obj('boxes', 88, 29);
   // 학생 휴게실 (3-7 앞)
@@ -490,6 +490,8 @@ function finishFloor(b) {
     objects,
     isFloor,
     isSolid: (x, y) => !inside(x, y) || solid[y][x],
+    // 이야기에 따라 자리를 옮기는 사람(아빠)의 칸을 막거나 튼다
+    setSolid: (x, y, on) => { if (inside(x, y)) solid[y][x] = on; },
     regionAt: (x, y) => regions.find(r => covers(r, x, y)) || null,
     warpAt: (x, y) => warps.find(r => covers(r, x, y)) || null,
     // 조사(F)할 수 있는 것: 대사가 있는 사물·장식, 엘리베이터, 말 걸 수 있는 사람(script)
@@ -500,7 +502,7 @@ function finishFloor(b) {
 // ── 지후네 집 ─────────────────────────────────
 
 function buildHome() {
-  const b = createFloor('home', 34, 24, { label: '집', style: 'home' });
+  const b = createFloor('home', 41, 24, { label: '집', style: 'home' });
 
   // 내 방
   b.room('내 방', 2, 4, 10, 8, 'wood');
@@ -528,13 +530,21 @@ function buildHome() {
   b.obj('dining', 20, 7, 3, 2);
   b.obj('sideboard', 25, 13, 3, 1, {
     ...clue('아빠의 졸업앨범',
-      '장식장에 두꺼운 앨범이 꽂혀 있다. "동산고등학교 제28회 졸업앨범 — 2000"',
+      '장식장에 두꺼운 앨범이 꽂혀 있다. "대전동산중학교 제52회 졸업앨범 — 2028"',
       '아빠네 반 페이지. 3학년 2반 서준호. 지금이랑 똑같이 생겼다.',
       '…이상하다. 다른 사람들은 친구랑 찍은 사진이 많은데, 아빠는 전부 혼자 찍혀 있다.'),
     flag: 'sawAlbum',
   });
   b.obj('bag', 29, 14, 1, 1, { script: 'dadBag', prompt: '조사하기' });   // 3장 목요일 밤: 아빠의 일기
   b.obj('plant', 14, 15);
+
+  // 안방 (아빠 방): 거실 오른쪽 문으로 이어진다
+  b.room('안방', 32, 7, 6, 7, 'wood');
+  b.carve(30, 10, 2, 2, 'door');
+  b.obj('bed', 36, 7, 2, 3);
+  b.obj('wardrobe', 32, 7, 2, 1, look('아빠 옷장. 맨 안쪽에 오래된 양복이 한 벌 걸려 있다.'));
+  b.dec('window', 34, 5, 2, 2);
+  b.obj('plant', 32, 13);
 
   // 현관 (아래로 나가면 등교)
   b.carve(19, 16, 2, 2, 'door');
@@ -568,7 +578,7 @@ function buildBus() {
   return finishFloor(b);
 }
 
-// 1998년 기억 속 층에서 쓰는 옛 교실 모양 (14칸)
+// 2026년 기억 속 층에서 쓰는 옛 교실 모양 (14칸)
 // 위쪽 줄 교실 (문은 아래 벽, 칠판은 위 벽)
 function topClassroom(b, name, x0, w = 14) {
   b.room(name, x0, 4, w, 10, 'wood');
@@ -583,9 +593,9 @@ function topClassroom(b, name, x0, w = 14) {
   }
 }
 
-// ── 1998년 2층 (기억 속): 지금의 창고가 아직 2학년 6반이던 때 ──
+// ── 2026년 2층 (기억 속): 지금의 창고가 아직 2학년 6반이던 때 ──
 function buildPast2F() {
-  const b = createFloor('p2', 66, 34, { label: '1998년 · 2층' });
+  const b = createFloor('p2', 66, 34, { label: '2026년 · 2층' });
   b.room('2층 복도', 2, 16, 60, 4, 'hall');
   b.obj('lockers', 3, 16, 8, 1);
   b.obj('lockers', 19, 16, 8, 1);
@@ -599,13 +609,13 @@ function buildPast2F() {
   topClassroom(b, '2학년 3반', 34);
   topClassroom(b, '2학년 4반', 50, 12);
 
-  // 2학년 6반 (1998)
+  // 2학년 6반 (2026)
   b.room('2학년 6반', 40, 22, 14, 9, 'wood');
   b.carve(50, 20, 2, 2, 'door');
-  b.dec('blackboard', 41, 21, 6, 1, look('칠판. "2학기 기말고사 둘째 날 — 2교시 국어, 3교시 수학"', '오른쪽 구석에 작게, 유성 매직으로. "221B"'));
-  b.dec('chart', 47, 21, 2, 1, look('감독 배정표. 2교시도 3교시도 "담임 문병철".'));
-  b.dec('calendar', 49, 21, 1, 1, look('1998년 12월 달력. 아직 아무 표시도 없다.'));
-  // 이수아의 기억: 복도로 나서면 고형석 패거리 (story.js 의 suahHall)
+  b.dec('blackboard', 41, 21, 6, 1, look('칠판. "2학기 기말고사 둘째 날 — 2교시 국어, 3교시 수학"', '오른쪽 구석에 작게, 유성 매직으로. "미스터리 추리동아리"'));
+  b.dec('chart', 47, 21, 2, 1, look('감독 배정표. 2교시도 3교시도 "담임 권도윤".'));
+  b.dec('calendar', 49, 21, 1, 1, look('2026년 12월 달력. 아직 아무 표시도 없다.'));
+  // 이수아의 기억: 복도로 나서면 허진 패거리 (story.js 의 suahHall)
   b.warps.push({ x: 2, y: 16, w: 60, h: 4, script: 'suahHall', once: 'shHall' });
   b.dec('window', 52, 20, 2, 2);
   b.obj('podium', 46, 22, 2, 1);

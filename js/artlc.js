@@ -1,36 +1,37 @@
 'use strict';
 // ─────────────────────────────────────────────
-// artlc.js — 「잠겨있던 교실」에서 새로 쓰는 그림과 인물
+// artlc.js — 「CLASS X」에서 새로 쓰는 그림과 인물
 // (art.js 다음에 읽는다. 같은 TILE_ART / DECO_ART / OBJ_ART / PEOPLE 에 덧붙인다)
 // ─────────────────────────────────────────────
 
 Object.assign(PEOPLE, {
-  // 건우(박건우): 지후의 친구. 짧게 깎은 머리, 체육복 상의(초록) 위에 교복
+  // 상욱(변상욱): 지후의 친구. 반에서 제일 큰 덩치, 짧게 깎은 머리, 초록 체육복, 책가방
   dolsoe: {
     pal: { ...PLAYER_PAL, hair: '#1a1410', hairHi: '#2e241c', blazer: '#2f6a4a', blazerDk: '#24543a', tie: '#2f6a4a', skin: '#e2b98e', skinSh: '#c99a70' },
-    tie: false,
+    tie: false, hair: 'crop', big: true, bag: true,
   },
-  // 최은비: 같은 반, 방송부. 갈색 단발, 노란 넥타이(방송부 배지 색)
+  // 최은비: 같은 반, 방송부. 하늘색 양 갈래 머리, 베이지 조끼, 방송부 헤드셋
   eunbi: {
-    pal: { ...PLAYER_PAL, hair: '#5a3422', hairHi: '#7a4a32', tie: '#d9a43a' },
+    pal: { ...PLAYER_PAL, hair: '#7fc4e8', hairHi: '#b4e2f6', blazer: '#d8c49a', blazerDk: '#b8a47a', tie: '#d9a43a', skirt: '#3a4468', skirtDk: '#2a3250' },
+    hair: 'twin', skirt: true, headset: true,
   },
-  // 문병철 교감: 벗어진 회색 머리, 회색 양복, 안경
+  // 권도윤 교감: 벗어진 회색 머리, 회색 양복, 안경
   gyogam: {
     pal: {
-      ...PLAYER_PAL, hair: '#76767c', hairHi: '#9a9aa2', blazer: '#55585f', blazerDk: '#43464c',
-      shirt: '#f0f0f0', tie: '#3a4a6a', pants: '#43464c', pantsDk: '#36383e',
+      ...PLAYER_PAL, hair: '#76767c', hairHi: '#9a9aa2', blazer: '#6a5038', blazerDk: '#523c28',
+      shirt: '#f0f0f0', tie: '#3a4a6a', pants: '#523c28', pantsDk: '#3e2c1c',
     },
-    glasses: true,
+    glasses: true, hair: 'balding',
   },
   // 담임 (2학년 6반): 남색 카디건
   homeroom: {
     pal: { ...PLAYER_PAL, hair: '#2a1e1a', hairHi: '#4a3428', blazer: '#34446a', blazerDk: '#283554', shirt: '#f0ece2' },
-    tie: false,
+    tie: false, hair: 'slick',
   },
 });
 
 Object.assign(DECO_ART, {
-  // 벽에 걸린 낡은 달력 (1998년 12월)
+  // 벽에 걸린 낡은 달력 (2026년 12월)
   calendar(g, x, y, w) {
     const X = x + (w >> 1) - 5;
     rect(g, X, y + 2, 10, 12, '#e8e0cc');
@@ -106,47 +107,54 @@ Object.assign(OBJ_ART, {
 // 단서 그림에 쓰는 숫자 0 (art.js 의 DIGITS 는 엘리베이터용 1~3만 있다)
 DIGITS[0] = ['111', '101', '101', '101', '111'];
 
-// 1998년 방송부 DJ (사연 해독 대결의 상대): 1998년 남색 교복, 붉은 넥타이, 헤드폰
+// 2026년 방송부 DJ (사연 해독 대결의 상대): 2026년 남색 교복, 붉은 넥타이, 헤드폰
 PEOPLE.dj98 = {
   pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3020', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' },
-  glasses: true,
+  glasses: true, headset: true,
 };
 
-// ── 3장: 이수아 선생님과 1998년의 사람들 ──
+// ── 3장: 이수아 선생님과 2026년의 사람들 ──
 Object.assign(PEOPLE, {
   // 이수아 선생님 (국어): 긴 머리를 묶었다, 베이지 카디건
   suah: {
-    pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#c8b48e', blazerDk: '#a8946e', shirt: '#f4f0e8', pants: '#4a4a56', pantsDk: '#3a3a44' },
-    tie: false,
+    pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#9aa0a8', blazerDk: '#7c828a', shirt: '#f4f0e8', pants: '#4a4a56', pantsDk: '#3a3a44', skirt: '#3e3a44', skirtDk: '#2e2a34' },
+    tie: false, hair: 'bob', glasses: true, skirt: true,
   },
-  // 1998년 교복: 진남색 재킷, 붉은 넥타이
-  suah98: { pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
-  jaemin98: { pal: { ...PLAYER_PAL, hair: '#1a1410', hairHi: '#3a2c20', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' }, glasses: true },
-  junho98: { pal: { ...PLAYER_PAL, hair: '#3a2a24', hairHi: '#5b4236', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
-  // 고형석 (1998): 재킷을 풀어 헤치고 넥타이 없이, 갈색 물들인 머리
-  hyungseok98: { pal: { ...PLAYER_PAL, hair: '#7a4a24', hairHi: '#9a6434', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#f4f4f4' }, tie: false },
-  gang98: { pal: { ...PLAYER_PAL, hair: '#141014', hairHi: '#2a2228', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#e8e8e8' }, tie: false },
-  // 문병철 (1998, 담임): 검은 머리, 회색 양복, 안경
+  // 2026년 교복: 진남색 재킷, 붉은 넥타이
+  suah98: { pal: { ...PLAYER_PAL, hair: '#2a1a14', hairHi: '#4a3024', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34', skirt: '#2a3256', skirtDk: '#1e2442' }, hair: 'long', skirt: true },
+  jaemin98: { pal: { ...PLAYER_PAL, hair: '#1a1410', hairHi: '#3a2c20', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' }, glasses: true, hair: 'crop' },
+  junho98: { pal: { ...PLAYER_PAL, hair: '#16141a', hairHi: '#34303c', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' }, hair: 'spiky' },
+  // 허진 (2026): 재킷을 풀어 헤치고 넥타이 없이, 갈색 물들인 머리
+  hyungseok98: { pal: { ...PLAYER_PAL, hair: '#7a4a24', hairHi: '#9a6434', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#f4f4f4' }, tie: false, hair: 'slick' },
+  gang98: { pal: { ...PLAYER_PAL, hair: '#141014', hairHi: '#2a2228', blazer: '#2a3256', blazerDk: '#1e2442', shirt: '#e8e8e8' }, tie: false, big: true, hair: 'crop' },
+  // 권도윤 (2026, 담임): 검은 머리, 회색 양복, 안경
   gyogam98: {
-    pal: { ...PLAYER_PAL, hair: '#1a1a1e', hairHi: '#33333a', blazer: '#55585f', blazerDk: '#43464c', shirt: '#f0f0f0', tie: '#3a4a6a', pants: '#43464c', pantsDk: '#36383e' },
-    glasses: true,
+    pal: { ...PLAYER_PAL, hair: '#1a1a1e', hairHi: '#33333a', blazer: '#6a5038', blazerDk: '#523c28', shirt: '#f0f0f0', tie: '#3a4a6a', pants: '#523c28', pantsDk: '#3e2c1c' },
+    glasses: true, hair: 'slick',
   },
-  // 학교운영위원장 (고형석의 아버지): 짙은 양복, 금색 넥타이
+  // 학교운영위원장 허승원 (허진의 아버지): 짙은 양복, 금색 넥타이
   chairman98: {
-    pal: { ...PLAYER_PAL, hair: '#2a2a2a', hairHi: '#444', blazer: '#1e1e26', blazerDk: '#141418', shirt: '#f0f0f0', tie: '#c8a03a', pants: '#1e1e26', pantsDk: '#141418' },
+    pal: { ...PLAYER_PAL, hair: '#8a8a90', hairHi: '#b0b0b8', blazer: '#1e1e26', blazerDk: '#141418', shirt: '#f0f0f0', tie: '#c8a03a', pants: '#1e1e26', pantsDk: '#141418' },
+    hair: 'slick', beard: true, big: true,
   },
   student98: { pal: { ...PLAYER_PAL, hair: '#241a14', hairHi: '#3e2e22', blazer: '#2a3256', blazerDk: '#1e2442', tie: '#a82a34' } },
 });
 
-// ── 4장: 지금의 고형석과 정재민 ──
+// ── 4장: 지금의 허진과 정재민 ──
 Object.assign(PEOPLE, {
-  // 동문회장 고형석: 넘긴 머리, 짙은 남색 양복, 금색 넥타이
+  // 동문회장 허진: 넘긴 머리, 짙은 남색 양복, 금색 넥타이
   hyungseok: {
-    pal: { ...PLAYER_PAL, hair: '#3a2a1a', hairHi: '#5a4026', blazer: '#1e2440', blazerDk: '#151a30', shirt: '#f4f4f4', tie: '#c8a03a', pants: '#1e2440', pantsDk: '#151a30' },
+    pal: { ...PLAYER_PAL, hair: '#9a9aa2', hairHi: '#c4c4cc', blazer: '#1e2440', blazerDk: '#151a30', shirt: '#f4f4f4', tie: '#c8a03a', pants: '#1e2440', pantsDk: '#151a30' },
+    hair: 'slick', glasses: true,
   },
   // 정재민 경위: 짧은 머리, 동그란 안경, 회색 점퍼
   jaemin: {
-    pal: { ...PLAYER_PAL, hair: '#2a2420', hairHi: '#4a4038', blazer: '#5a5e66', blazerDk: '#464a52', shirt: '#e8e8e8', pants: '#3a3a44', pantsDk: '#2e2e36' },
-    glasses: true, tie: false,
+    pal: { ...PLAYER_PAL, hair: '#2a2420', hairHi: '#4a4038', blazer: '#5a5e66', blazerDk: '#464a52', shirt: '#9ab4d8', pants: '#3a3a44', pantsDk: '#2e2e36' },
+    glasses: true, tie: false, hair: 'crop',
+  },
+  // 양복을 입은 아빠 (금요일 기념식)
+  dadSuit: {
+    pal: { ...PLAYER_PAL, hair: '#57524d', hairHi: '#7a756e', blazer: '#3a3e4a', blazerDk: '#2a2e38', shirt: '#f0f0f0', tie: '#7a2a34', pants: '#3a3e4a', pantsDk: '#2a2e38' },
+    glasses: true,
   },
 });

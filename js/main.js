@@ -54,7 +54,7 @@ for (const key of ['home', 1, 2, 3]) {
     CLUES.push(s.clue);
   }
 }
-// 회상 속에선 다른 사람(예: 1998년의 누군가)이 된다 — who: PEOPLE 이름, null 이면 지후
+// 회상 속에선 다른 사람(예: 2026년의 누군가)이 된다 — who: PEOPLE 이름, null 이면 지후
 let playerFrames = makePlayerFrames();
 function setPlayerLook(who) {
   playerFrames = who ? makePersonFrames(PEOPLE[who].pal, PEOPLE[who]) : makePlayerFrames();
@@ -65,7 +65,7 @@ let floor = FLOORS.home;
 const player = { x: 0, y: 0, dir: 'down', anim: 0, moving: false, scriptAnim: 0 };
 let cutscene = false;   // 컷신 중엔 움직이거나 조사할 수 없다 (대사 넘기기만 가능)
 
-// 동료(건우): floor 층에 visible 이면 보이고, following 이면 플레이어가 지나간 길을 따라온다
+// 동료(상욱): floor 층에 visible 이면 보이고, following 이면 플레이어가 지나간 길을 따라온다
 const companion = { visible: false, following: false, floor: 1, x: 0, y: 0, dir: 'down', anim: 0, moving: false, moveTimer: 0 };
 const COMPANION_GAP = 17;     // 플레이어 뒤로 얼마나(px) 떨어져서 따라오는지 (걸을 땐 조금 더 벌어진다)
 const COMPANION_EASE = 9;     // 클수록 바짝, 작을수록 느긋하게 따라온다
@@ -194,6 +194,7 @@ function fadeIn(done = null) {
 // to: { x, y, dir } — x, y 는 픽셀/16 (y는 발밑)
 function setFloor(n, to) {
   floor = FLOORS[n];
+  if (n === 'home' && typeof syncDad === 'function') syncDad();   // 아빠를 이야기에 맞는 자리로 (story.js)
   camFocus = null;
   player.x = to.x * TILE;
   player.y = to.y * TILE;
@@ -286,8 +287,41 @@ function updateFade(dt) {
 // ── 대사창 ──
 // 페이지는 '문자열'(서술, * 표시) 또는 { who: '이름', text: '대사' }
 const TYPE_SPEED = 30; // 초당 글자 수
-const dialog = { pages: null, page: 0, shown: 0, choice: null, resolve: null };
+const CHOICE_LOCK = 0.6; // 선택지가 다 나온 뒤 이만큼(초) 지나야 고를 수 있다
+const dialog = { pages: null, page: 0, shown: 0, choice: null, resolve: null, choiceWait: 0, drawn: '' };
 const pageText = p => (typeof p === 'string' ? p : p.text);
+
+// 대사 속 중요한 낱말 (굵게 + 다른 색으로 보여 준다). 긴 것부터 찾는다
+const KEYWORDS = [
+  '미스터리 추리동아리', '추리동아리',
+  '답은 언제나 맨 앞에 있다', '증거 없이는 말하지 않는다', '친구를 버리지 않는다',
+  '앨범 내 얼굴 뒤', '얼굴 파인 사진', '파인 사진', '학급 앨범', '졸업앨범', '명렬표',
+  '쪽지', '감독표', '방명록', '생활기록부', '활동 보고서', '사연', '감사패', '익명 게시판',
+  '정재민', '허진', '권도윤', '허승원', '운영위원장',
+  '잠긴 교실', '자료실', '방송실', '행정실', '열쇠함', '제1연구실', '체육관', '화장실 창문', '난간',
+  '12월 15일', '12월 16일', '12월 18일', '10시 55분', '기념식',
+].sort((a, b) => b.length - a.length);
+const KEYWORD_RE = new RegExp(KEYWORDS.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+const escapeHtml = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const markCache = new Map();   // 대사 전체 글 → 강조할 구간 [시작, 끝]
+function keywordRanges(text) {
+  let r = markCache.get(text);
+  if (!r) {
+    r = [...text.matchAll(KEYWORD_RE)].map(m => [m.index, m.index + m[0].length]);
+    markCache.set(text, r);
+  }
+  return r;
+}
+// 타자 효과로 n글자까지만 보일 때도, 강조 낱말은 첫 글자부터 강조된 채로 찍힌다
+function markedHtml(text, n = text.length) {
+  let html = '', at = 0;
+  for (const [s, e] of keywordRanges(text)) {
+    if (s >= n) break;
+    html += escapeHtml(text.slice(at, s)) + '<b>' + escapeHtml(text.slice(s, Math.min(e, n))) + '</b>';
+    at = Math.min(e, n);
+  }
+  return html + escapeHtml(text.slice(at, n));
+}
 
 // choice: { options: [...], index, onPick(i) } — 마지막 페이지에서 고른다
 // 대사창이 닫히면 끝나는 Promise를 돌려준다 (story.js에서 await)
@@ -296,6 +330,8 @@ function openDialog(pages, choice = null) {
   dialog.page = 0;
   dialog.shown = 0;
   dialog.choice = choice;
+  dialog.choiceWait = 0;
+  dialog.drawn = '';
   // 캐릭터가 화면 아래쪽에 있으면 대사창을 위로
   const screenY = Math.round(player.y) - camera.y;
   // 화면을 고정한 컷신에선 위쪽(무대 등)을 가리지 않게 늘 아래에
@@ -327,7 +363,11 @@ function renderChoices() {
 function updateDialog(dt) {
   const lastPage = dialog.page === dialog.pages.length - 1;
   const typed = dialog.shown >= pageText(dialog.pages[dialog.page]).length;
-  const choosing = lastPage && typed && dialog.choice;
+  // 질문과 선택지가 모두 나온 뒤, 잠깐(CHOICE_LOCK) 지나야 고를 수 있다
+  const choicesUp = lastPage && typed && dialog.choice;
+  if (choicesUp) dialog.choiceWait += dt;
+  const choosing = choicesUp && dialog.choiceWait >= CHOICE_LOCK;
+  if (choicesUp && !choosing) tapped.delete('interact');
 
   if (choosing) {
     const c = dialog.choice, count = c.options.length;
@@ -359,10 +399,15 @@ function updateDialog(dt) {
   const who = typeof p === 'string' ? '' : p.who;
   dialogName.textContent = who;
   dialogName.style.display = who ? '' : 'none';
-  dialogText.textContent = (who ? '' : '* ') + text.slice(0, after);
+  const key = dialog.page + ':' + after;
+  if (key !== dialog.drawn) {   // 글자가 늘었을 때만 다시 그린다
+    dialog.drawn = key;
+    dialogText.innerHTML = (who ? '' : '* ') + markedHtml(text, after);
+  }
   const showChoices = dialog.choice && lastPage && dialog.shown >= text.length;
   if (showChoices) renderChoices();
   else dialogChoices.textContent = '';
+  dialogChoices.classList.toggle('locked', !!showChoices && dialog.choiceWait < CHOICE_LOCK);
   dialogNext.classList.toggle('show', dialog.shown >= text.length && !showChoices);
 }
 
@@ -475,8 +520,8 @@ function pickMenu(id) {
     case 'controls':
       Controls.toggle();
       Menu.show(menuItems(), Controls.mode === 'touch'
-        ? '왼쪽 조이스틱으로 이동, 끝까지 밀면 달리기.\nF 조사 · Q 건우 · ☰ 메뉴 · 수첩 · 지도'
-        : 'WASD 이동 · Shift 달리기 · F 조사\nQ 건우 · Tab 수첩 · M 지도 · Esc 메뉴', 5);
+        ? '왼쪽 조이스틱으로 이동, 끝까지 밀면 달리기.\nF 조사 · Q 상욱 · ☰ 메뉴 · 수첩 · 지도'
+        : 'WASD 이동 · Shift 달리기 · F 조사\nQ 상욱 · Tab 수첩 · M 지도 · Esc 메뉴', 5);
       break;
     case 'fullscreen':
       toggleFullscreen();
@@ -615,7 +660,7 @@ function update(dt) {
       runScript('friend');
       return;
     }
-    Toast.show(flags.memory ? '건우가 없는 기억 속' : '건우는 지금 곁에 없다.');
+    Toast.show(flags.memory ? '상욱이가 없는 기억 속' : '상욱이는 지금 곁에 없다.');
   }
 
   const dx = (keys.has('right') ? 1 : 0) - (keys.has('left') ? 1 : 0);

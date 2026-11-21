@@ -1057,7 +1057,7 @@ function makeHighlight(src, color = '#ffe066') {
 }
 
 // ── 사람 스프라이트 (16×24, 4방향 × 4프레임) ─────
-// 주인공과 NPC가 같은 몸을 쓰고 색(팔레트)과 넥타이·안경만 다르다
+// 주인공과 NPC가 같은 뼈대를 쓰고, 색(팔레트)·머리 모양·체격·옷차림(drawPerson 의 opts)으로 구분한다
 
 const PLAYER_PAL = {
   hair: '#3a2a24', hairHi: '#5b4236',
@@ -1142,28 +1142,51 @@ const PEOPLE = {
   },
   // 같은 학교 학생들 (머리색만 다르게)
   student1: { pal: { ...PLAYER_PAL, hair: '#1e1612', hairHi: '#3a2a22' } },
-  student2: { pal: { ...PLAYER_PAL, hair: '#6b4a2e', hairHi: '#8a6440' } },
-  student3: { pal: { ...PLAYER_PAL, hair: '#2a2430', hairHi: '#463c50' }, glasses: true },
+  student2: { pal: { ...PLAYER_PAL, hair: '#6b4a2e', hairHi: '#8a6440', skirt: '#2d2f3b' }, hair: 'long', skirt: true },
+  student3: { pal: { ...PLAYER_PAL, hair: '#2a2430', hairHi: '#463c50' }, glasses: true, hair: 'crop' },
 };
 
 // frame: 0 서기, 1 왼발, 2 서기, 3 오른발
-function drawPerson(g, dir, frame, P = PLAYER_PAL, { tie = true, glasses = false, camera = false } = {}) {
+// 인물마다 다른 생김새 (opts):
+//   hair: 'short'(기본) | 'spiky' 삐죽 | 'crop' 짧게 깎음 | 'twin' 양 갈래 | 'bob' 단발 | 'long' 긴 머리
+//         | 'balding' 벗어진 머리 | 'slick' 뒤로 넘긴 머리
+//   big: 덩치가 크다 · skirt: 치마 · beard: 수염 · glasses: 안경 · tie: 넥타이 · bag: 책가방 · headset: 헤드셋
+function drawPerson(g, dir, frame, P = PLAYER_PAL, opts = {}) {
+  const { tie = true, glasses = false, camera = false, hair = 'short', big = false, skirt = false, beard = false, bag = false, headset = false } = opts;
   const step = frame === 1 ? 1 : frame === 3 ? -1 : 0;
+  const legCol = skirt ? P.skin : P.pants, legColDk = skirt ? P.skinSh : P.pantsDk;
+  const skirtCol = P.skirt || P.pants;
+  const bagCol = P.bag || '#4a6a8a';
+  const front = dir === 'down' || dir === 'up';
 
-  if (dir === 'down' || dir === 'up') {
+  if (front) {
     const lLift = step === -1 ? 1 : 0, rLift = step === 1 ? 1 : 0;
-    rect(g, 5, 17, 3, 4 - lLift, P.pants);
-    rect(g, 5, 21 - lLift, 3, 1, P.shoe);
-    rect(g, 8, 17, 3, 4 - rLift, P.pantsDk);
-    rect(g, 8, 21 - rLift, 3, 1, P.shoe);
+    const lx = big ? 4 : 5, lw = big ? 4 : 3;   // 덩치가 크면 다리도 굵다
+    rect(g, lx, 17, lw, 4 - lLift, legCol);
+    rect(g, lx, 21 - lLift, lw, 1, P.shoe);
+    rect(g, 8, 17, lw, 4 - rLift, legColDk);
+    rect(g, 8, 21 - rLift, lw, 1, P.shoe);
+    if (skirt) {
+      rect(g, 4, 17, 8, 3, skirtCol);
+      rect(g, 4, 19, 8, 1, P.skirtDk || P.pantsDk);
+    }
 
-    rect(g, 4, 11, 8, 6, P.blazer);
-    rect(g, 11, 11, 1, 6, P.blazerDk);
+    const bx = big ? 3 : 4, bw = big ? 10 : 8;
+    rect(g, bx, 11, bw, 6, P.blazer);
+    rect(g, bx + bw - 1, 11, 1, 6, P.blazerDk);
     const lArm = step === 1 ? 1 : 0, rArm = step === -1 ? 1 : 0;
-    rect(g, 3, 11, 1, 5 - lArm, P.blazerDk);
-    rect(g, 3, 16 - lArm, 1, 1, P.skin);
-    rect(g, 12, 11, 1, 5 - rArm, P.blazerDk);
-    rect(g, 12, 16 - rArm, 1, 1, P.skin);
+    rect(g, bx - 1, 11, 1, 5 - lArm, P.blazerDk);
+    rect(g, bx - 1, 16 - lArm, 1, 1, P.skin);
+    rect(g, bx + bw, 11, 1, 5 - rArm, P.blazerDk);
+    rect(g, bx + bw, 16 - rArm, 1, 1, P.skin);
+    if (bag && dir === 'down') {   // 가방끈
+      rect(g, bx + 1, 11, 1, 5, bagCol);
+      rect(g, bx + bw - 2, 11, 1, 5, bagCol);
+    }
+    if (bag && dir === 'up') {
+      rect(g, 5, 11, 6, 5, bagCol);
+      rect(g, 6, 12, 4, 1, 'rgba(255,255,255,0.25)');
+    }
 
     rect(g, 3, 1, 10, 10, P.hair);
     if (dir === 'down') {
@@ -1176,8 +1199,28 @@ function drawPerson(g, dir, frame, P = PLAYER_PAL, { tie = true, glasses = false
         rect(g, 7, 14, 2, 1, '#6fa8d8');
       }
       rect(g, 4, 5, 8, 5, P.skin);
-      rect(g, 4, 5, 2, 1, P.hair);
-      rect(g, 8, 5, 3, 1, P.hair);
+      // 앞머리
+      if (hair === 'spiky') {
+        rect(g, 4, 5, 8, 1, P.hair);
+        rect(g, 5, 6, 1, 1, P.hair);
+        rect(g, 8, 6, 1, 1, P.hair);
+        rect(g, 11, 6, 1, 1, P.hair);
+      } else if (hair === 'crop') {
+        rect(g, 4, 4, 8, 1, P.skin);          // 이마가 훤하다
+      } else if (hair === 'slick') {
+        rect(g, 4, 4, 8, 1, P.skin);
+        rect(g, 4, 3, 8, 1, P.hairHi);        // 뒤로 넘긴 결
+      } else if (hair === 'balding') {
+        rect(g, 5, 2, 6, 3, P.skin);          // 정수리가 벗어졌다
+        rect(g, 6, 2, 3, 1, '#fff2dc');
+      } else if (hair === 'bob' || hair === 'twin' || hair === 'long') {
+        rect(g, 4, 5, 8, 1, P.hair);          // 일자 앞머리
+        rect(g, 4, 6, 1, 1, P.hair);
+        rect(g, 11, 6, 1, 1, P.hair);
+      } else {
+        rect(g, 4, 5, 2, 1, P.hair);
+        rect(g, 8, 5, 3, 1, P.hair);
+      }
       rect(g, 4, 10, 8, 1, P.skinSh);
       rect(g, 5, 7, 1, 2, P.eye);
       rect(g, 10, 7, 1, 2, P.eye);
@@ -1186,26 +1229,41 @@ function drawPerson(g, dir, frame, P = PLAYER_PAL, { tie = true, glasses = false
         rect(g, 9, 6, 3, 1, '#2a2a2a');
         rect(g, 7, 7, 2, 1, '#2a2a2a');
       }
+      if (beard) {
+        rect(g, 4, 9, 8, 1, P.hair);
+        rect(g, 5, 10, 6, 1, P.hair);
+        rect(g, 7, 9, 2, 1, P.skinSh);        // 입
+      }
     } else {
       rect(g, 6, 11, 4, 1, P.shirt);
       rect(g, 5, 10, 6, 1, P.skinSh);
+      if (hair === 'crop') rect(g, 5, 9, 6, 1, P.skin);
+      if (hair === 'balding') { rect(g, 5, 1, 6, 4, P.skin); rect(g, 6, 2, 3, 1, '#fff2dc'); }
+      if (hair === 'long') rect(g, 4, 10, 8, 5, P.hair);
+      if (hair === 'bob') rect(g, 4, 10, 8, 2, P.hair);
     }
-    rect(g, 5, 2, 4, 1, P.hairHi);
+    if (hair !== 'balding') rect(g, 5, 2, 4, 1, P.hairHi);
   } else {
     // 왼쪽을 보는 옆모습 (오른쪽은 좌우 반전)
     if (step === 0) {
-      rect(g, 6, 17, 4, 4, P.pants);
+      rect(g, 6, 17, 4, 4, legCol);
       rect(g, 5, 21, 5, 1, P.shoe);
     } else {
-      const front = step === 1 ? P.pants : P.pantsDk;
-      const back = step === 1 ? P.pantsDk : P.pants;
-      rect(g, 8, 17, 3, 4, back);
+      const frontLeg = step === 1 ? legCol : legColDk;
+      const backLeg = step === 1 ? legColDk : legCol;
+      rect(g, 8, 17, 3, 4, backLeg);
       rect(g, 8, 21, 4, 1, P.shoe);
-      rect(g, 4, 17, 3, 4, front);
+      rect(g, 4, 17, 3, 4, frontLeg);
       rect(g, 3, 21, 4, 1, P.shoe);
     }
-    rect(g, 5, 11, 6, 6, P.blazer);
-    rect(g, 5, 11, 1, 2, P.shirt);
+    if (skirt) {
+      rect(g, 4, 17, 8, 3, skirtCol);
+      rect(g, 4, 19, 8, 1, P.skirtDk || P.pantsDk);
+    }
+    const bx = big ? 4 : 5, bw = big ? 8 : 6;
+    if (bag) rect(g, bx + bw, 11, 2, 5, bagCol);
+    rect(g, bx, 11, bw, 6, P.blazer);
+    rect(g, bx, 11, 1, 2, P.shirt);
     const armX = 7 - step;
     rect(g, armX, 11, 2, 5, P.blazerDk);
     rect(g, armX, 16, 2, 1, P.skin);
@@ -1213,17 +1271,62 @@ function drawPerson(g, dir, frame, P = PLAYER_PAL, { tie = true, glasses = false
     rect(g, 3, 1, 10, 10, P.hair);
     rect(g, 3, 5, 5, 5, P.skin);
     rect(g, 3, 5, 1, 1, P.hair);
+    if (hair === 'spiky' || hair === 'bob' || hair === 'twin' || hair === 'long') rect(g, 3, 5, 4, 1, P.hair);
+    if (hair === 'crop' || hair === 'slick') rect(g, 3, 4, 5, 1, P.skin);
+    if (hair === 'slick') rect(g, 4, 3, 8, 1, P.hairHi);
+    if (hair === 'balding') { rect(g, 3, 1, 7, 4, P.skin); rect(g, 5, 2, 3, 1, '#fff2dc'); }
     rect(g, 4, 10, 4, 1, P.skinSh);
     rect(g, 4, 7, 1, 2, P.eye);
     if (glasses) rect(g, 3, 6, 3, 1, '#2a2a2a');
     rect(g, 8, 7, 1, 2, P.skinSh);
-    rect(g, 6, 2, 4, 1, P.hairHi);
+    if (beard) { rect(g, 3, 9, 4, 1, P.hair); rect(g, 4, 10, 3, 1, P.hair); }
+    if (hair !== 'balding') rect(g, 6, 2, 4, 1, P.hairHi);
   }
   // 머리 모서리 둥글게
   g.clearRect(3, 1, 1, 1);
   g.clearRect(12, 1, 1, 1);
   g.clearRect(3, 10, 1, 1);
   g.clearRect(12, 10, 1, 1);
+
+  // 머리 모양 (모서리를 깎은 뒤에 덧그린다)
+  if (hair === 'spiky') {
+    // 위로 삐죽 솟은 머리
+    if (front) { rect(g, 4, 0, 1, 1, P.hair); rect(g, 7, 0, 2, 1, P.hair); rect(g, 11, 0, 1, 1, P.hair); }
+    else { rect(g, 5, 0, 1, 1, P.hair); rect(g, 8, 0, 2, 1, P.hair); rect(g, 12, 2, 1, 1, P.hair); }
+  } else if (hair === 'crop') {
+    // 짧게 깎은 머리: 윗줄을 한 칸 낮춘다
+    g.clearRect(3, 1, 10, 1);
+    g.clearRect(3, 2, 1, 1);
+    g.clearRect(12, 2, 1, 1);
+  } else if (hair === 'twin') {
+    // 양 갈래: 머리 양옆으로 길게 늘어진다 + 머리끈
+    if (front) {
+      rect(g, 1, 4, 2, 9, P.hair); rect(g, 13, 4, 2, 9, P.hair);
+      rect(g, 1, 13, 1, 1, P.hair); rect(g, 14, 13, 1, 1, P.hair);
+      rect(g, 2, 4, 1, 1, P.tie); rect(g, 13, 4, 1, 1, P.tie);
+      rect(g, 1, 6, 1, 3, P.hairHi); rect(g, 14, 6, 1, 3, P.hairHi);
+    } else {
+      rect(g, 11, 4, 3, 10, P.hair);
+      rect(g, 12, 14, 1, 1, P.hair);
+      rect(g, 11, 4, 1, 1, P.tie);
+      rect(g, 13, 6, 1, 4, P.hairHi);
+    }
+  } else if (hair === 'bob') {
+    // 단발: 턱선까지 내려온다
+    if (front) { rect(g, 3, 9, 1, 3, P.hair); rect(g, 12, 9, 1, 3, P.hair); }
+    else rect(g, 9, 9, 4, 3, P.hair);
+  } else if (hair === 'long') {
+    // 긴 머리: 어깨 아래까지
+    if (front) { rect(g, 3, 9, 1, 6, P.hair); rect(g, 12, 9, 1, 6, P.hair); }
+    else rect(g, 10, 9, 3, 6, P.hair);
+  } else if (hair === 'balding' && front) {
+    rect(g, 3, 5, 1, 4, P.hair); rect(g, 12, 5, 1, 4, P.hair);   // 옆머리만 남았다
+  }
+  if (headset) {
+    // 방송부 헤드셋
+    if (front) { rect(g, 4, 1, 8, 1, '#2a2a2e'); rect(g, 2, 5, 2, 3, '#2a2a2e'); rect(g, 12, 5, 2, 3, '#2a2a2e'); }
+    else { rect(g, 5, 1, 6, 1, '#2a2a2e'); rect(g, 8, 5, 2, 3, '#2a2a2e'); }
+  }
 }
 
 // 걸어다니는 사람의 4방향 × 4프레임 (주인공, 따라다니는 친구)
@@ -1247,7 +1350,9 @@ function makePersonFrames(pal = PLAYER_PAL, opts = {}) {
   return frames;
 }
 
-const makePlayerFrames = () => makePersonFrames();
+// 주인공 지후: 삐죽 솟은 머리
+const PLAYER_LOOK = { hair: 'spiky' };
+const makePlayerFrames = () => makePersonFrames(PLAYER_PAL, PLAYER_LOOK);
 
 // ─────────────────────────────────────────────
 // 집 · 버스
