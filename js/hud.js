@@ -41,6 +41,15 @@ function drawPlayerDot(g, x, y, time) {
 
 const MINI = { w: 72, h: 54, scale: 2, margin: 6 };
 
+// 어두운 방 (잠긴 창고): 그 안에 있지 않으면 지도에서도 속을 가린다 (모양만 남긴다)
+function hideDarkRooms(g, floor, ox, oy, s) {
+  for (const r of floor.map.regions) {
+    if (!r.dark || r === currentRegion) continue;
+    g.fillStyle = '#16141c';
+    for (const [x, y, w, h] of r.dark) g.fillRect(ox + x * s, oy + y * s, w * s, h * s);
+  }
+}
+
 function drawMinimap(g, floor, player, time) {
   // 터치 조작일 땐 오른쪽 아래가 버튼 자리라서 왼쪽 위(장소 이름 아래)로
   const touch = Controls.mode === 'touch';
@@ -58,6 +67,7 @@ function drawMinimap(g, floor, player, time) {
   g.rect(x0, y0, MINI.w, MINI.h);
   g.clip();
   g.drawImage(floor.mini, ox, oy, floor.mini.width * MINI.scale, floor.mini.height * MINI.scale);
+  hideDarkRooms(g, floor, ox, oy, MINI.scale);
   g.restore();
 
   drawPlayerDot(g, x0 + MINI.w / 2, y0 + MINI.h / 2, time);
@@ -103,6 +113,7 @@ const FullMap = (() => {
     rect(g, L.x0 - 2, L.y0 - 2, L.w + 4, L.h + 4, '#fff');
     rect(g, L.x0 - 1, L.y0 - 1, L.w + 2, L.h + 2, '#000');
     g.drawImage(floor.mini, L.x0, L.y0, L.w, L.h);
+    hideDarkRooms(g, floor, L.x0, L.y0, L.s);
     drawPlayerDot(g, Math.round(L.x0 + player.x / TILE * L.s), Math.round(L.y0 + (player.y - 4) / TILE * L.s), time);
   }
 

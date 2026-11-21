@@ -284,6 +284,8 @@ function build2F() {
   b.room('창고', 78, 22, 12, 9, 'wood');
   b.carve(88, 20, 2, 2, 'door');
   b.obj('padlock', 88, 20, 2, 2, { script: 'lockedDoor', prompt: '살펴보기' });
+  // 밖에서는 안이 안 보이게 어둡게 (안에 들어가야 보인다). 자물쇠 달린 문(88~89)은 빼고 위쪽 벽면까지
+  b.regions.find(r => r.name === '창고').dark = [[78, 20, 10, 2], [78, 22, 12, 9]];
   b.dec('dustyWindow', 78, 20, 2, 2, { script: 'roomWindow', prompt: '창문으로 나가기' });
   b.dec('blackboard', 80, 21, 6, 1, clue('칠판 구석의 221B',
     '칠판은 거의 다 지워져 있다.',

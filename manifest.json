@@ -1,0 +1,9 @@
+{
+  "name": "잠겨있던 교실",
+  "short_name": "잠겨있던 교실",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

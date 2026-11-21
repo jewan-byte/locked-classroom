@@ -71,15 +71,32 @@ const COMPANION_GAP = 17;     // 플레이어 뒤로 얼마나(px) 떨어져서 
 const COMPANION_EASE = 9;     // 클수록 바짝, 작을수록 느긋하게 따라온다
 let trail = [];               // 플레이어가 지나간 자리
 
-// ── 화면 크기: 정수 배율로 꽉 차게 ──
+// ── 화면 크기: 4:3 비율을 지키면서 화면을 최대한 꽉 채운다 (태블릿에서도 크게) ──
+// 배율이 정수가 아니어도 캔버스는 pixelated 로 그려서 픽셀이 뭉개지지 않는다
 function fit() {
-  const s = Math.max(1, Math.floor(Math.min(innerWidth / VIEW_W, innerHeight / VIEW_H)));
-  stage.style.width = VIEW_W * s + 'px';
-  stage.style.height = VIEW_H * s + 'px';
+  const s = Math.max(0.5, Math.min(innerWidth / VIEW_W, innerHeight / VIEW_H));
+  stage.style.width = Math.floor(VIEW_W * s) + 'px';
+  stage.style.height = Math.floor(VIEW_H * s) + 'px';
   stage.style.setProperty('--s', s);
 }
 addEventListener('resize', fit);
+addEventListener('orientationchange', () => setTimeout(fit, 200));
 fit();
+
+// ── 전체 화면 (브라우저 주소창·탭을 숨긴다) ──
+const fullscreenOn = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function toggleFullscreen() {
+  const el = document.documentElement;
+  try {
+    if (fullscreenOn()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+  } catch (e) { /* 전체 화면을 못 쓰는 브라우저 — 그냥 둔다 */ }
+}
+// 터치 기기는 처음 화면을 누를 때 한 번 자동으로 전체 화면
+addEventListener('pointerdown', function autoFull(e) {
+  removeEventListener('pointerdown', autoFull);
+  if (e.pointerType === 'touch' && !fullscreenOn()) toggleFullscreen();
+});
 
 // ── 입력 ──
 const keys = new Set();     // 누르고 있는 키
@@ -428,6 +445,7 @@ const menuItems = () => [
   { id: 'minimap', label: minimapOn ? '미니맵 끄기' : '미니맵 켜기' },
   { id: 'sound', label: Sound.muted ? '소리 켜기' : '소리 끄기' },
   { id: 'controls', label: `조작 방식: ${Controls.mode === 'touch' ? '터치 (조이스틱)' : '키보드'}` },
+  { id: 'fullscreen', label: fullscreenOn() ? '전체 화면 끄기' : '전체 화면' },
   { id: 'reset', label: '처음부터 다시' },
   { id: 'dev', label: '개발자 메뉴 (`)' },
 ];
@@ -459,6 +477,10 @@ function pickMenu(id) {
       Menu.show(menuItems(), Controls.mode === 'touch'
         ? '왼쪽 조이스틱으로 이동, 끝까지 밀면 달리기.\nF 조사 · Q 건우 · ☰ 메뉴 · 수첩 · 지도'
         : 'WASD 이동 · Shift 달리기 · F 조사\nQ 건우 · Tab 수첩 · M 지도 · Esc 메뉴', 5);
+      break;
+    case 'fullscreen':
+      toggleFullscreen();
+      Menu.close();
       break;
     case 'reset':
       Menu.show(
@@ -706,6 +728,12 @@ function draw() {
   }
   drawables.sort((a, b) => a.base - b.base);
   for (const d of drawables) d.draw();
+  // 어두운 방 (잠긴 창고): 그 방 안에 있지 않으면 까맣게 가린다
+  for (const r of floor.map.regions) {
+    if (!r.dark || r === currentRegion) continue;
+    g.fillStyle = '#030308';   // 불투명하게 완전히 가린다 (위에 노을 색만 살짝 덧칠된다)
+    for (const [dx, dy, dw, dh] of r.dark) g.fillRect(dx * TILE - camX, dy * TILE - camY, dw * TILE, dh * TILE);
+  }
   if (floor.map.night) {
     drawNight(camX, camY, px, py);
     if (smoke === floor.map.n) drawSmoke();
