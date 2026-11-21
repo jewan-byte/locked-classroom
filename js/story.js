@@ -53,7 +53,7 @@ function resetFlags() {
     day1Done: false,     // 1장 끝
     // 2장 「사라진 얼굴」
     ch2: false,          // 11월 17일 화요일 점심시간
-    sawReport: false,    // 동아리 창고: 221B 활동 보고서 (정재민)
+    sawReport: false,    // 자료실: 221B 활동 보고서 (정재민)
     tueEvening: false,   // 화요일 저녁, 집
     askedJaemin: false,  // 아빠에게 정재민을 물어봄
     bandDone: false,     // 동창 밴드에 메시지 (아무도 모른다)
@@ -71,7 +71,7 @@ function resetFlags() {
     ch3: false,          // 목요일 1교시 국어
     memory: null,        // 지금 누구의 기억 속인지 ('suah' | 'gyogam'), 현실이면 null
     suahClass: false,    // 국어 시간: 판서의 ③ 꼬리 = 쪽지 글씨
-    suahMet: false,      // 교무실: 쪽지를 보여 줌 → 이수아의 기억
+    suahMet: false,      // 제1연구실: 쪽지를 보여 줌 → 이수아의 기억
     shHall: false,       // 기억 속: 복도의 고형석 패거리 (부탁 → 협박으로 뒤집힘)
     shExam: false,       // 기억 속: 2교시 국어, 쪽지, 재민의 눈, 창밖을 보던 감독
     suahMemDone: false,  // 기억에서 돌아옴 (모순 2개)
@@ -130,7 +130,7 @@ const ROLL_CLUE = storyClue('빈칸 하나', '2층 · 창고',
 const DUST = ['rgba(255,150,70,0.16)', 'rgba(30,20,12,0.38)'];   // 해 질 녘, 먼지 낀 창고
 
 // 2장 단서
-const REPORT_CLUE = storyClue('221B 활동 보고서', '1층 · 동아리 창고',
+const REPORT_CLUE = storyClue('221B 활동 보고서', '1층 · 자료실',
   '추리 동아리 「221B」 1998년 보고서. 부장 정재민, 기록 서준호. 둘뿐이다.',
   '규칙 하나, 답은 언제나 맨 앞에 있다. 둘, 증거 없이는 말하지 않는다. 셋, 친구를 버리지 않는다.',
   '12월 활동: "2학년 6반 기말고사 건 — 조사 중". 마지막 줄: "12월 18일. 부장 전학. 활동 중지."');
@@ -239,7 +239,7 @@ const EXPERIMENTS = {
     ],
   },
 
-  // 3장 목요일, 교무실 — 이수아 선생님의 28년 된 자책
+  // 3장 목요일, 제1연구실 — 이수아 선생님의 28년 된 자책
   handwriting: {
     title: '필체 대조',
     mini: 'handwriting',
@@ -299,7 +299,7 @@ const EXPERIMENTS = {
     ],
   },
 
-  // 3장 목요일, 교무실 — 문병철 교감의 생활기록부
+  // 3장 목요일, 제1연구실 — 문병철 교감의 생활기록부
   timetable: {
     title: '감독표 대조',
     mini: 'timetable',
@@ -515,9 +515,9 @@ const fadeBlack = () => new Promise(r => fadeTo(() => { fade.dir = 0; r(); }));
 const HOME_START = { x: 5, y: 8, dir: 'down' };       // 침대 옆
 const HOME_DOOR = { x: 20, y: 18.5, dir: 'up' };      // 집 현관 (저녁에 돌아오면)
 const BUS_SEAT = { x: 13.5, y: 4.95, dir: 'up' };     // 창가 자리
-const CLASS_SEAT = { x: 20, y: 30.4, dir: 'up' };     // 2학년 6반 뒷줄 통로
-const ROOM_LAND = { x: 52.5, y: 24.4, dir: 'down' };  // 창고 창문 아래
-const TOILET_BACK = { x: 60.5, y: 23.4, dir: 'down' };// 화장실 창문 아래
+const CLASS_SEAT = { x: 95.9, y: 13.4, dir: 'up' };     // 2학년 6반 뒷줄 통로
+const ROOM_LAND = { x: 78.6, y: 24.4, dir: 'down' };  // 창고 창문 아래
+const TOILET_BACK = { x: 98.5, y: 23.4, dir: 'down' };// 화장실 창문 아래
 
 const hasClue = name => CLUES.some(c => c.name === name && c.found);
 const giveClue = (c, msg = `새 단서: ${c.name}  (Tab)`) => {
@@ -527,7 +527,7 @@ const giveClue = (c, msg = `새 단서: ${c.name}  (Tab)`) => {
 };
 
 // 방과 후: 노을, 건우가 따라다닌다
-function setupAfterSchool(where = 2, at = { x: 20, y: 30.4, dir: 'up' }) {
+function setupAfterSchool(where = 2, at = CLASS_SEAT) {
   ambient = DUSK;
   actors.length = 0;
   flags.friendJoined = true;
@@ -542,17 +542,17 @@ function setupCeremony() {
   actors.length = 0;
   companion.visible = true;
   companion.following = false;
-  setFloor(1, { x: 79.5, y: 51.5, dir: 'up' });
-  camFocus = { x: 79.5 * TILE, y: 47 * TILE };
-  Object.assign(companion, { floor: 1, x: 81 * TILE, y: 51.6 * TILE, dir: 'up' });
-  addActor('hyungseok', 80.5, 42.7, 'down', 1);   // 무대 앞 (무대 그림에 가리지 않게)
-  addActor('gyogam', 77, 42.7, 'down', 1);
-  for (const [x, y] of [[72.5, 46.5], [74.5, 46.5], [76.5, 46.5], [82.5, 46.5], [84.5, 46.5], [86.5, 46.5], [73.5, 48.5], [75.5, 48.5], [77.5, 48.5], [81.5, 48.5], [83.5, 48.5], [85.5, 48.5]]) {
+  setFloor(1, { x: 98.5, y: 68.5, dir: 'up' });
+  camFocus = { x: 98.5 * TILE, y: 64 * TILE };
+  Object.assign(companion, { floor: 1, x: 100 * TILE, y: 68.6 * TILE, dir: 'up' });
+  addActor('hyungseok', 99.5, 59.7, 'down', 1);   // 무대 앞 (무대 그림에 가리지 않게)
+  addActor('gyogam', 96, 59.7, 'down', 1);
+  for (const [x, y] of [[91.5,63.5], [93.5,63.5], [95.5,63.5], [101.5,63.5], [103.5,63.5], [105.5,63.5], [92.5,65.5], [94.5,65.5], [96.5,65.5], [100.5,65.5], [102.5,65.5], [104.5,65.5]]) {
     addActor(['student1', 'student2', 'student3'][Math.floor(x + y) % 3], x, y, 'up', 1);
   }
-  addActor('eunbi', 88.5, 44.5, 'left', 1);
-  addActor('suah', 70, 45.5, 'right', 1);
-  if (flags.dadComes) addActor('dad', 75.5, 52.5, 'up', 1);
+  addActor('eunbi', 107.5, 61.5, 'left', 1);
+  addActor('suah', 89, 62.5, 'right', 1);
+  if (flags.dadComes) addActor('dad', 94.5, 69.5, 'up', 1);
 }
 
 // 낮 장면 (점심시간 등): 건우가 따라다닌다. amb: 화면 색 (없으면 null)
@@ -638,9 +638,9 @@ function ch3Doing() {
   if (flags.dadConfessed) return '내 방 책상 — 해원고 정재민 찾아보기';
   if (flags.dadRefused && !flags.readDiary) return '아빠는 방으로 들어갔다… 거실 구석의 검은 가방';
   if (flags.thuEvening) return '저녁 — 아빠와 이야기하기';
-  if (flags.gotGuestbook && !flags.suahWon) return '1층 교무실 — 수아 선생님께 필체 대조';
+  if (flags.gotGuestbook && !flags.suahWon) return '1층 제1연구실 — 수아 선생님께 필체 대조';
   if (flags.suahMemDone) return '체육관 — 기념식 방명록 (고형석의 글씨)';
-  if (flags.suahClass) return '1층 교무실 — 이수아 선생님 찾아가기';
+  if (flags.suahClass) return '1층 제1연구실 — 이수아 선생님 찾아가기';
   return '1교시 국어';
 }
 
@@ -656,7 +656,7 @@ function ch2Doing() {
   if (flags.askedJaemin) return '내 방 책상 — 아빠의 중학교 동창 찾아보기';
   if (flags.tueEvening) return '저녁 — 아빠에게 정재민에 대해 묻기';
   if (flags.sawReport) return '오후 수업';
-  return '1층 동아리 창고에서 1998년 기록 찾기';
+  return '1층 자료실에서 1998년 기록 찾기';
 }
 
 // 지금 장면에 맞는 배경음악 (main.js 가 매 프레임 묻는다 — audio.js 가 바뀔 때만 넘어간다)
@@ -832,10 +832,10 @@ const SCRIPTS = {
     await say({ who: '안내 방송', text: '이번 정류장은 동산고등학교, 동산고등학교입니다.' });
     await fadeAsync(() => {
       setFloor(2, CLASS_SEAT);
-      addActor('dolsoe', 23, 30.4, 'left', 2);
-      addActor('eunbi', 21.5, 28.2, 'down', 2);
-      addActor('student1', 18.5, 24.2, 'up', 2);
-      addActor('student3', 25.5, 24.2, 'up', 2);
+      addActor('dolsoe', 98.5, 13.4, 'left', 2);
+      addActor('eunbi', 95.9, 10.8, 'down', 2);
+      addActor('student1', 92.8, 8.6, 'up', 2);
+      addActor('student3', 98.6, 8.6, 'up', 2);
     });
     await SCRIPTS.classroom();
   },
@@ -883,14 +883,14 @@ const SCRIPTS = {
     actors.length = 0;
     await showChapter('1장\n잠긴 교실', 2.4);
     await showChapter('같은 날, 방과 후\n오후 4시 20분', 2.2);
-    setupAfterSchool(2, { x: 20, y: 30.4, dir: 'up' });
+    setupAfterSchool(2, CLASS_SEAT);
     flags.afterSchool = true;
     await fadeInAsync();
     await say(
       '교실엔 우리 둘만 남았다. 창밖으로 해가 기울고 있다.',
       { who: FRIEND, text: '…진짜 가는 거야?' },
       { who: ME, text: '내기 하자고 한 사람이 누군데.' },
-      { who: FRIEND, text: '그, 그렇지. 잠긴 교실은 이 층 끝, 화장실 옆이야. 지금은 "창고"라고 붙어 있어.' },
+      { who: FRIEND, text: '그, 그렇지. 잠긴 교실은 바로 우리 반 앞, 화장실 옆이야. 지금은 "창고"라고 붙어 있어.' },
     );
   },
 
@@ -1036,19 +1036,19 @@ const SCRIPTS = {
     Sound.sfx('step');
     await say('…저벅. 저벅.', '복도에서 발소리가 다가온다.', { who: FRIEND, text: '(…미, 미신 넷!)' });
     await fadeAsync(() => {
-      player.x = 42.5 * TILE;
+      player.x = 80.5 * TILE;
       player.y = 25.4 * TILE;
       player.dir = 'right';
-      Object.assign(companion, { x: 41.4 * TILE, y: 25.4 * TILE, dir: 'right', floor: 2 });
+      Object.assign(companion, { x: 79.4 * TILE, y: 25.4 * TILE, dir: 'right', floor: 2 });
       trail = [{ x: companion.x, y: companion.y }, { x: player.x, y: player.y }];
     });
     await say('쌓아 둔 책상 더미 뒤로 몸을 숨겼다.');
     Sound.sfx('lock');
     await wait(0.6);
-    const g = addActor('gyogam', 50.5, 20.5, 'down', 2);
-    await walkActor(g, 50.5, 24.5, 1.2);
+    const g = addActor('gyogam', 88.5, 20.5, 'down', 2);
+    await walkActor(g, 88.5, 24.5, 1.2);
     await say('회색 양복, 반쯤 벗어진 머리. 문병철 교감 선생님이다.');
-    await walkActor(g, 46.5, 29.3, 1.6);
+    await walkActor(g, 84, 29.3, 1.6);
     g.dir = 'down';
     await wait(0.8);
     await say(
@@ -1061,8 +1061,8 @@ const SCRIPTS = {
     await say('교감 선생님이 고개를 들어 칠판 쪽을 본다.', '바닥 먼지 위에… 우리 발자국이.');
     await wait(0.6);
     await say('지이잉— 교감 선생님의 휴대폰이 울렸다.', { who: '교감', text: '네, 회장님. …네, 금요일 기념식 준비는 다 됐습니다. 걱정 마십시오.' });
-    await walkActor(g, 50.5, 24.5, 1.4);
-    await walkActor(g, 50.5, 20.5, 1);
+    await walkActor(g, 88.5, 24.5, 1.4);
+    await walkActor(g, 88.5, 20.5, 1);
     removeActor(g);
     Sound.sfx('lock');
     await say(
@@ -1241,8 +1241,8 @@ const SCRIPTS = {
     await showChapter('11월 17일 화요일\n점심시간', 2.2);
     flags.ch2 = true;
     setupDay(2, CLASS_SEAT);
-    addActor('student1', 18.5, 24.2, 'up', 2);
-    addActor('student2', 25.5, 26.2, 'up', 2);
+    addActor('student1', 92.8, 8.6, 'up', 2);
+    addActor('student2', 98.6, 10.6, 'up', 2);
     await fadeInAsync();
     if (flags.rumorOk) {
       await say(
@@ -1250,7 +1250,7 @@ const SCRIPTS = {
         '"[잠긴 교실 진짜 들어가 봄] 얼굴 파인 사진 실존함 (사진 있음)"',
         '댓글: "합성 아님?" "미신 셋 실화냐" "나 그 옆 화장실 쓰는데 이제 못 감"',
         '그때, 교실 스피커가 지직거렸다.',
-        { who: '교내 방송', text: '교감입니다. 어제 방과 후 2층 창고에 무단으로 들어간 학생은, 오늘 중으로 교무실로 오기 바랍니다.' },
+        { who: '교내 방송', text: '교감입니다. 어제 방과 후 2층 창고에 무단으로 들어간 학생은, 오늘 중으로 제1연구실로 오기 바랍니다.' },
         { who: FRIEND, text: '……' },
         { who: FRIEND, text: '…글, 지금 지울게.' },
         { who: ME, text: '…이미 늦었어. 교감쌤도 본 거야.' },
@@ -1267,12 +1267,12 @@ const SCRIPTS = {
         ? { who: ME, text: '"친구. 오래전에 연락이 끊긴." …그게 다야. 이름도 안 알려 줬어.' }
         : { who: ME, text: '…못 물어봤어. 아빠 얼굴 보니까 말이 안 나오더라.' },
       { who: FRIEND, text: '흠. 그럼 이름부터 알아내야겠네. 얼굴 파인 사람.' },
-      { who: FRIEND, text: '1998년이면… 아! 동아리 활동 보고서. 1층 동아리 창고에 없어진 동아리 서류가 다 쌓여 있대.' },
+      { who: FRIEND, text: '1998년이면… 아! 동아리 활동 보고서. 1층 자료실에 없어진 동아리 서류가 다 쌓여 있대.' },
       { who: FRIEND, text: '칠판의 "221B"가 동아리 이름이면, 거기 있을 거야.' },
     );
   },
 
-  // 1층 동아리 창고 — 221B 활동 보고서
+  // 1층 자료실 — 221B 활동 보고서
   async reportShelf() {
     if (!flags.ch2) {
       await say('없어진 동아리들의 활동 보고서 철이 꽂혀 있다.', '먼지가 너무 쌓여서 지금은 손대고 싶지 않다.');
@@ -1339,7 +1339,7 @@ const SCRIPTS = {
       { who: ME, text: '아빠. 정재민이 누구야?' },
       '타자를 치던 손이 멈췄다.',
       { who: '아빠', text: '…그 이름은 어디서.' },
-      { who: ME, text: '학교 동아리 창고. 221B 활동 보고서. 부장 정재민, 기록 서준호.' },
+      { who: ME, text: '학교 자료실에서 찾았어. 221B 활동 보고서. 부장 정재민, 기록 서준호.' },
       { who: ME, text: '앨범에서 얼굴 파인 사람, 그 사람이지?' },
       { who: '아빠', text: '……' },
       { who: '아빠', text: '중학교 때부터 친구였어. 동산중, 동산고. 맨날 붙어 다녔지.' },
@@ -1425,7 +1425,7 @@ const SCRIPTS = {
     await showChapter('11월 18일 수요일\n점심시간', 2.2);
     flags.wed = true;
     setupDay(2, CLASS_SEAT);
-    const eunbi = addActor('eunbi', 21.5, 28.2, 'down', 2);
+    const eunbi = addActor('eunbi', 95.9, 10.8, 'down', 2);
     await fadeInAsync();
     await say(
       { who: FRIEND, text: '…그래서 동창들도 아무도 모른다고?' },
@@ -1456,11 +1456,11 @@ const SCRIPTS = {
       { who: '은비', text: '방송부 자료 캐비닛에 90년대 테이프 다 있어. 열쇠는 나한테 있고.' },
       { who: '은비', text: '점심 방송 끝났으니까… 가 볼래? 1층 방송실. 먼저 가 있을게.' },
     );
-    await walkActor(eunbi, 24.5, 22.5, 1.0);
-    await walkActor(eunbi, 24.5, 20.5, 0.5);
+    await walkActor(eunbi, 95.9, 13.4, 0.8);
+    await walkActor(eunbi, 95.9, 15.6, 0.5);
     removeActor(eunbi);
     flags.toBroadcast = true;
-    addActor('eunbi', 57.5, 9.2, 'down', 1);
+    addActor('eunbi', 71.5, 39.8, 'down', 1);
   },
 
   // 1층 방송실에 들어서면: 1998년 사연 테이프 → 사연 해독
@@ -1512,7 +1512,7 @@ const SCRIPTS = {
     actors.length = 0;
     await showChapter('같은 날, 방과 후\n오후 4시 30분', 2);
     flags.roomAgain = true;
-    setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);   // 화장실 앞 복도
+    setupDay(2, { x: 94.5, y: 18.5, dir: 'down' }, DUSK);   // 화장실 앞 복도
     await fadeInAsync();
     await say({ who: FRIEND, text: '…가자. 빨리 끝내자. 화장실 창문.' });
   },
@@ -1651,10 +1651,10 @@ const SCRIPTS = {
     await showChapter('11월 19일 목요일\n1교시 국어', 2.2);
     flags.ch3 = true;
     setupDay(2, CLASS_SEAT);
-    const t = addActor('suah', 20.5, 23.6, 'down', 2);
-    addActor('student1', 18.5, 24.2 + 2, 'up', 2);
-    addActor('eunbi', 21.5, 28.2, 'up', 2);
-    addActor('student3', 25.5, 24.2, 'up', 2);
+    const t = addActor('suah', 96, 4.8, 'down', 2);
+    addActor('student1', 92.8, 10.6, 'up', 2);
+    addActor('eunbi', 95.9, 10.8, 'up', 2);
+    addActor('student3', 98.6, 8.6, 'up', 2);
     await fadeInAsync();
     await say(
       '1교시, 국어. 이수아 선생님이 교탁 앞에 섰다.',
@@ -1670,12 +1670,13 @@ const SCRIPTS = {
       { who: ME, text: '(…응. 선생님 글씨야.)' },
     );
     Sound.sfx('chime');
-    await say('딩동댕동—', { who: '이수아 선생님', text: '오늘은 여기까지. 질문 있으면 쉬는 시간에 교무실로 와.' });
-    await walkActor(t, 24.5, 22.5, 0.9);
-    await walkActor(t, 24.5, 20.5, 0.5);
+    await say('딩동댕동—', { who: '이수아 선생님', text: '오늘은 여기까지. 질문 있으면 쉬는 시간에 제1연구실로 와.' });
+    await walkActor(t, 93, 6.2, 0.4);
+    await walkActor(t, 93, 13.4, 0.7);
+    await walkActor(t, 95.9, 15.6, 0.5);
     actors.length = 0;
     flags.suahClass = true;
-    addActor('suah', 57.5, 25.4, 'down', 1);
+    addActor('suah', 56, 8.8, 'down', 1);
     // 1장에서 감독표를 못 봤어도 3장 대결에 쓸 수 있게: 건우가 찍어 둔 사진
     const chart = CLUES.find(c => c.name === '기말고사 감독표');
     if (!chart.found) {
@@ -1685,21 +1686,21 @@ const SCRIPTS = {
       );
       giveClue(chart);
     }
-    await say({ who: FRIEND, text: '…교무실 가자. 1층 오른쪽 끝.' });
+    await say({ who: FRIEND, text: '…제1연구실 가자. 1층 계단 바로 왼쪽.' });
   },
 
-  // 1층 교무실에 들어서면 (3장)
+  // 1층 제1연구실에 들어서면 (3장)
   async office3() {
     if (!flags.ch3 || flags.memory || flags.thuEvening) return;
     if (flags.suahClass && !flags.suahMet) return SCRIPTS.suahScene();
     if (flags.gotGuestbook && flags.suahMemDone && !flags.suahWon) return SCRIPTS.suahFight();
   },
 
-  // 교무실: 쪽지를 내민다 → 이수아의 기억
+  // 제1연구실: 쪽지를 내민다 → 이수아의 기억
   async suahScene() {
     flags.suahMet = true;
     await say(
-      '이수아 선생님이 창가 자리에서 수행평가지를 넘기고 있다.',
+      '이수아 선생님이 자기 자리에서 수행평가지를 넘기고 있다.',
       { who: '이수아 선생님', text: '지후랑 건우네. 질문?' },
       { who: ME, text: '…선생님. 이거, 선생님 글씨 맞죠?' },
       '쪽지를 책상 위에 내려놓았다.',
@@ -1783,8 +1784,8 @@ const SCRIPTS = {
     startGlitch(1.2);
     await fadeBlack();
     endMemory();
-    setupDay(1, { x: 57.5, y: 27.6, dir: 'up' });
-    addActor('suah', 57.5, 25.4, 'down', 1);
+    setupDay(1, { x: 56, y: 12.4, dir: 'up' });
+    addActor('suah', 56, 8.8, 'down', 1);
     await fadeInAsync();
     await say(
       { who: '이수아 선생님', text: '…그래서 재민이는 나 때문에 전학 갔어. 형석이는 시킨 적 없어. 내가 보여 준 거야.' },
@@ -1823,10 +1824,10 @@ const SCRIPTS = {
       '휴대폰으로 서명을 찍었다.',
     );
     giveClue(GUEST_CLUE);
-    await say({ who: FRIEND, text: '교무실로 가자. 수아 선생님한테 보여 드리자.' });
+    await say({ who: FRIEND, text: '제1연구실로 가자. 수아 선생님한테 보여 드리자.' });
   },
 
-  // 교무실: 필체 대조 → 교감의 기억 → 감독표 대조
+  // 제1연구실: 필체 대조 → 교감의 기억 → 감독표 대조
   async suahFight() {
     await say('이수아 선생님은 아직 그 자리에 앉아 있었다.', { who: ME, text: '선생님. 확인하고 싶은 게 있어요.' });
     if (!await Experiment.start(EXPERIMENTS.handwriting)) return;
@@ -1862,12 +1863,12 @@ const SCRIPTS = {
   },
 
   async gyogamScene() {
-    const g = addActor('gyogam', 56.5, 20.6, 'down', 1);
-    await walkActor(g, 56.5, 23, 0.8);
+    const g = addActor('gyogam', 56.5, 15.4, 'down', 1);
+    await walkActor(g, 58.2, 12.4, 0.8);
     g.dir = 'down';
     await say(
       { who: '교감', text: '서지후. 박건우.' },
-      '교감 선생님이 교무실 문 앞에 서 있었다.',
+      '교감 선생님이 제1연구실 문 앞에 서 있었다.',
       { who: '교감', text: '창고 무단 침입. 학교 기물 반출. 그리고 지금은… 선생님을 몰아세우는 건가.' },
       { who: ME, text: '정재민 씨는 왜 전학 갔어요? 담임이셨잖아요.' },
       { who: '교감', text: '…그 학생은 친구를 모함하고, 폭력까지 썼다. 생활기록부에 다 남아 있다.' },
@@ -1917,9 +1918,9 @@ const SCRIPTS = {
     startGlitch(1.2);
     await fadeBlack();
     endMemory();
-    setupDay(1, { x: 57.5, y: 27.6, dir: 'up' });
-    addActor('suah', 57.5, 25.4, 'down', 1);
-    const g2 = addActor('gyogam', 56.5, 23, 'down', 1);
+    setupDay(1, { x: 56, y: 12.4, dir: 'up' });
+    addActor('suah', 56, 8.8, 'down', 1);
+    const g2 = addActor('gyogam', 58.2, 12.4, 'left', 1);
     await fadeInAsync();
     await say({ who: '교감', text: '…나는 봤다. 봤어.' }, '교감 선생님의 목소리가 조금 흔들렸다.');
     giveClue(CONTRA_GG_SEAT);
@@ -1938,9 +1939,9 @@ const SCRIPTS = {
       { who: ME, text: '…"아직 그대로군." 그 말, 그 뜻이었어요?' },
       { who: '교감', text: '……' },
       { who: '교감', text: '내일 기념식은 예정대로 한다. 고형석 회장은 감사패를 받는다. 너희가 뭘 하든.' },
-      '교감 선생님은 그 말만 남기고 교무실을 나갔다. 등이 작아 보였다.',
+      '교감 선생님은 그 말만 남기고 제1연구실을 나갔다. 등이 작아 보였다.',
     );
-    await walkActor(g2, 56.5, 20.6, 0.9);
+    await walkActor(g2, 56.5, 15.4, 0.9);
     removeActor(g2);
     await say(
       { who: '이수아 선생님', text: '…지후야. 재민이, 찾을 수 있겠니?' },
@@ -2214,7 +2215,7 @@ const SCRIPTS = {
     if (flags.finalChoice === 'dad') {
       const dad = actors.find(a => a.who === 'dad');
       await say('그때, 뒤쪽에서 누군가 일어섰다.', { who: '아빠', text: '…잠깐만요.' });
-      await walkActor(dad, 78.5, 47.5, 1.4);
+      await walkActor(dad, 97.5, 64.5, 1.4);
       dad.dir = 'up';
       await say(
         { who: '아빠', text: '저는 2000년 졸업생 서준호입니다. 1998년, 2학년 6반이었습니다.' },
@@ -2250,7 +2251,7 @@ const SCRIPTS = {
     if (flags.suahTestify) {
       count++;
       const s = actors.find(a => a.who === 'suah');
-      await walkActor(s, 74.5, 47.5, 1.0);
+      await walkActor(s, 93.5, 64.5, 1.0);
       await say(
         '교사석에서 이수아 선생님이 일어섰다.',
         { who: '이수아 선생님', text: '…있습니다. 제가 그 쪽지를 썼습니다. 1998년 2학년 6반, 이수아입니다.' },
@@ -2274,9 +2275,9 @@ const SCRIPTS = {
     }
     if (flags.jaeminMaybe) {
       count++;
-      const j = addActor('jaemin', 66.5, 57.5, 'right', 1);
+      const j = addActor('jaemin', 85.5, 74.5, 'right', 1);
       await say('…체육관 뒷문이 열렸다.');
-      await walkActor(j, 71.5, 53.5, 1.4);
+      await walkActor(j, 90.5, 70.5, 1.4);
       j.dir = 'up';
       await say(
         '회색 점퍼. 동그란 안경. 숨이 조금 차 있다.',
@@ -2295,8 +2296,8 @@ const SCRIPTS = {
     await fadeBlack();
     actors.length = 0;
     await showChapter('오전 9시 30분\n체육관 무대 옆', 2.0);
-    setupDay(1, { x: 84.5, y: 45.5, dir: 'up' });
-    addActor('hyungseok', 86.5, 43.4, 'down', 1);
+    setupDay(1, { x: 103.5, y: 62.5, dir: 'up' });
+    addActor('hyungseok', 105.5, 60.4, 'down', 1);
     await fadeInAsync();
     await say(
       '고형석이 감사패를 들고 거울 앞에서 표정을 연습하고 있었다.',
@@ -2348,9 +2349,9 @@ const SCRIPTS = {
     await showChapter('다음 주 월요일\n방과 후', 2.2);
     flags.ch4Room = true;
     showPadlock(false);
-    setupDay(2, { x: 50.5, y: 24, dir: 'down' }, DUSK);
-    if (flags.dadComes) addActor('dad', 45.5, 29.2, 'right', 2);
-    if (flags.jaeminMaybe) addActor('jaemin', 47.5, 29.2, 'left', 2);
+    setupDay(2, { x: 88.5, y: 23.6, dir: 'down' }, DUSK);
+    if (flags.dadComes) addActor('dad', 82.5, 29.2, 'right', 2);
+    if (flags.jaeminMaybe) addActor('jaemin', 85, 29.2, 'left', 2);
     await fadeInAsync();
     await say(
       '2층 창고의 쇠사슬이 풀렸다. 문이 열려 있다.',
@@ -2389,9 +2390,9 @@ const SCRIPTS = {
     await showChapter('그날 오후\n2층 창고', 2.2);
     flags.ch4Room = true;
     showPadlock(false);
-    setupDay(2, { x: 50.5, y: 24, dir: 'down' }, DUSK);
-    addActor('dad', 45.5, 29.2, 'right', 2);
-    addActor('jaemin', 47.5, 29.2, 'left', 2);
+    setupDay(2, { x: 88.5, y: 23.6, dir: 'down' }, DUSK);
+    addActor('dad', 82.5, 29.2, 'right', 2);
+    addActor('jaemin', 85, 29.2, 'left', 2);
     await fadeInAsync();
     await say(
       '교감 선생님이 말없이 열쇠를 건네줬다. "열어 줄 사람은… 너희 같다."',
@@ -2477,8 +2478,8 @@ const SCRIPTS = {
     // 숨은 에필로그: 프롤로그에서 아빠의 학교 얘기를 들었고, 진실을 소문으로 만들지 않았다면
     if (flags.dadStory && !flags.rumorNote && (n === 1 || n === 2)) {
       await showChapter('에필로그\n「221B, 다시」', 2.6);
-      setupDay(2, { x: 46, y: 28.4, dir: 'up' }, DUSK);
-      addActor('eunbi', 48.5, 28.4, 'up', 2);
+      setupDay(2, { x: 83, y: 28.4, dir: 'up' }, DUSK);
+      addActor('eunbi', 85.5, 28.4, 'up', 2);
       await fadeInAsync();
       await say(
         '한 달 뒤. 창고였던 교실은, 다시 교실이 됐다.',
@@ -2515,9 +2516,9 @@ const SCRIPTS = {
     }
     if (flags.ch3) {
       if (flags.thuEvening) pages = [{ who: FRIEND, text: '(건우는 집에 갔다.)' }];
-      else if (flags.gotGuestbook) pages = [{ who: FRIEND, text: '교무실! 방명록 서명이랑 쪽지 뒷면, 수아 선생님 앞에서 맞춰 보자.' }];
-      else if (flags.suahMemDone) pages = [{ who: FRIEND, text: '체육관 무대 옆에 방명록 있어. 운동장 오른쪽 끝.' }, { who: FRIEND, text: '고형석 글씨만 있으면 돼.' }];
-      else pages = [{ who: FRIEND, text: '교무실은 1층 오른쪽 끝이야. 수아 선생님, 창가 자리.' }];
+      else if (flags.gotGuestbook) pages = [{ who: FRIEND, text: '제1연구실! 방명록 서명이랑 쪽지 뒷면, 수아 선생님 앞에서 맞춰 보자.' }];
+      else if (flags.suahMemDone) pages = [{ who: FRIEND, text: '체육관 무대 옆에 방명록 있어. 앞마당 지나서 운동장 오른쪽.' }, { who: FRIEND, text: '고형석 글씨만 있으면 돼.' }];
+      else pages = [{ who: FRIEND, text: '제1연구실은 1층 계단 바로 왼쪽이야. 수아 선생님, 가운데 자리.' }];
       await say(...pages);
       return;
     }
@@ -2526,11 +2527,11 @@ const SCRIPTS = {
       else if (flags.foundNote) pages = [{ who: FRIEND, text: '창문! 나가서 얘기하자.' }];
       else if (flags.inRoom2) pages = [{ who: FRIEND, text: '뒤쪽 사물함 맨 끝 칸. 앨범 속 파인 사진, 그 뒤야.' }];
       else if (flags.roomAgain) pages = [{ who: FRIEND, text: '2층 화장실 창문. …이번이 진짜 마지막이다.' }];
-      else if (flags.toBroadcast) pages = [{ who: FRIEND, text: '1층 방송실. 과학실 오른쪽 끝이야. 은비가 기다려.' }];
+      else if (flags.toBroadcast) pages = [{ who: FRIEND, text: '1층 방송실. 중앙현관 바로 오른쪽이야. 은비가 기다려.' }];
       else if (flags.sawReport) pages = [{ who: FRIEND, text: '…정재민. 이름을 알았으니까, 이제 사람을 찾아야지.' }];
       else pages = [
-        { who: FRIEND, text: '1층 동아리 창고. 행정실이랑 교무실 사이야.' },
-        { who: FRIEND, text: '안쪽 왼쪽 책장에 옛날 보고서 철이 꽂혀 있어.' },
+        { who: FRIEND, text: '1층 자료실. 1-4반 앞, 남직원 화장실이랑 협의회실 사이야.' },
+        { who: FRIEND, text: '작은 방인데, 안쪽 책장에 옛날 보고서 철이 꽂혀 있어.' },
       ];
       await say(...pages);
       return;
@@ -2545,11 +2546,11 @@ const SCRIPTS = {
         ? [{ who: FRIEND, text: '칠판, 벽에 붙은 종이, 책상… 미신이 진짜인지 하나씩 보자.' }, { who: FRIEND, text: '…아까 뒤쪽 사물함 하나 문이 덜 닫혀 있던데. 나는 무서워서 못 열어.' }]
         : [{ who: FRIEND, text: '뒤쪽 사물함! 문 덜 닫힌 거. 그거 열면 끝이야.' }];
     } else if (flags.checkedKeys) {
-      pages = [{ who: FRIEND, text: '2층 화장실, 창고 바로 옆이야. 창문 밖 난간.' }, { who: FRIEND, text: '…나 진짜 높은 데 무서운데.' }];
+      pages = [{ who: FRIEND, text: '2층 화장실, 우리 반 바로 앞. 창고 옆이야. 창문 밖 난간.' }, { who: FRIEND, text: '…나 진짜 높은 데 무서운데.' }];
     } else if (flags.triedDoor) {
-      pages = [{ who: FRIEND, text: '1층 행정실 열쇠함. 현관에서 오른쪽, 계단 쪽으로 가다 보면 있어.' }];
+      pages = [{ who: FRIEND, text: '1층 행정실 열쇠함. 중앙현관 바로 왼쪽이야.' }];
     } else if (flags.afterSchool) {
-      pages = [{ who: FRIEND, text: '잠긴 교실은 이 층 끝, 화장실 바로 옆이야.' }, { who: FRIEND, text: '…문 앞까지만 가 보자. 앞까지만.' }];
+      pages = [{ who: FRIEND, text: '잠긴 교실은 우리 반 바로 앞, 화장실 옆이야.' }, { who: FRIEND, text: '…문 앞까지만 가 보자. 앞까지만.' }];
     } else {
       pages = [{ who: FRIEND, text: '…' }];
     }
@@ -2618,17 +2619,18 @@ const DEV_SPOTS = [
   ['집 · 내 방', 'home', 5, 8],
   ['집 · 거실', 'home', 21, 11],
   ['버스 (창밖 풍경)', 'bus', 13.5, 4.95],
-  ['1층 · 앞마당', 1, 8, 37],
-  ['1층 · 행정실', 1, 20, 24],
-  ['1층 · 방송실', 1, 57, 10],
-  ['1층 · 동아리 창고', 1, 46, 29],
-  ['1층 · 교무실', 1, 57.5, 30],
-  ['1층 · 체육관', 1, 80, 50],
-  ['2층 · 2학년 6반', 2, 20, 30.4],
-  ['2층 · 창고 문 앞', 2, 50.5, 19],
-  ['2층 · 창고 안', 2, 52.5, 24.4],
-  ['2층 · 화장실', 2, 60.5, 24],
-  ['3층 · 도서관', 3, 50, 23],
+  ['1층 · 앞마당', 1, 60, 49],
+  ['1층 · 중앙현관', 1, 60, 40],
+  ['1층 · 행정실', 1, 46, 40],
+  ['1층 · 방송실', 1, 71.5, 40],
+  ['1층 · 자료실', 1, 30, 25],
+  ['1층 · 제1연구실', 1, 56, 12.4],
+  ['1층 · 체육관', 1, 98.5, 68.5],
+  ['2층 · 2학년 6반', 2, 95.9, 13.4],
+  ['2층 · 창고 문 앞', 2, 88.5, 18.5],
+  ['2층 · 창고 안', 2, 78.6, 24.4],
+  ['2층 · 화장실', 2, 97.5, 24],
+  ['3층 · 옥상 (야외교실)', 3, 26, 26],
 ];
 
 // 이야기 단계: 그 시점까지의 플래그·단서를 맞추고 그 자리로
@@ -2640,15 +2642,15 @@ const DEV_STAGES = [
   ['1장 — 창고 안', 'room'],
   ['1장 — 앨범 찾은 뒤 (교감 장면 끝)', 'album'],
   ['1장 — 월요일 저녁, 집', 'evening'],
-  ['2장 — 화요일 점심 (동아리 창고로)', 'ch2'],
+  ['2장 — 화요일 점심 (자료실로)', 'ch2'],
   ['2장 — 화요일 저녁, 집 (아빠)', 'tue'],
   ['2장 — 수요일 점심 (은비)', 'wed'],
   ['2장 — 방송실 앞 (사연 테이프·해독)', 'tape'],
   ['2장 — 해독 후, 창고 다시 (앨범 두고 온 경우)', 'room2'],
   ['3장 — 목요일 1교시 국어', 'ch3'],
-  ['3장 — 교무실 (이수아의 기억 들어가기)', 'suah'],
+  ['3장 — 제1연구실 (이수아의 기억 들어가기)', 'suah'],
   ['3장 — 기억에서 돌아옴 (방명록 찾으러)', 'guest'],
-  ['3장 — 방명록 얻음 (교무실로: 필체·감독표 대결)', 'hand'],
+  ['3장 — 방명록 얻음 (제1연구실로: 필체·감독표 대결)', 'hand'],
   ['3장 — 목요일 저녁 (아빠 마음 높음)', 'thu'],
   ['3장 — 목요일 저녁 (아빠 마음 낮음 → 가방)', 'thulow'],
   ['4장 — 금요일 (증인 모두: 엔딩 1·2)', 'd5high'],
@@ -2681,7 +2683,7 @@ function devStage(stage) {
   }
   Object.assign(flags, { triedDoor: true, checkedKeys: true });
   if (stage === 'keys') {
-    setupAfterSchool(2, { x: 58.5, y: 24, dir: 'up' });
+    setupAfterSchool(2, { x: 97.5, y: 24, dir: 'up' });
     return;
   }
   flags.inRoom = true;
@@ -2694,7 +2696,7 @@ function devStage(stage) {
   ALBUM_CLUE.found = ROLL_CLUE.found = true;
   route.evidence = 2;
   if (stage === 'album') {
-    setupAfterSchool(2, { x: 52.5, y: 24.4, dir: 'up' });
+    setupAfterSchool(2, { x: 78.6, y: 24.4, dir: 'up' });
     ambient = DUST;
     return;
   }
@@ -2726,14 +2728,14 @@ function devStage(stage) {
   }
   flags.toBroadcast = true;
   if (stage === 'tape') {
-    setupDay(1, { x: 55.5, y: 17.5, dir: 'up' });
-    addActor('eunbi', 57.5, 9.2, 'down', 1);
+    setupDay(1, { x: 70.5, y: 31.5, dir: 'down' });
+    addActor('eunbi', 71.5, 39.8, 'down', 1);
     return;
   }
   Object.assign(flags, { heardTape: true, decoded: true, roomAgain: true });
   TAPE_CLUE.found = true;
   route.evidence = 5;
-  if (stage === 'room2') return setupDay(2, { x: 58.5, y: 19, dir: 'down' }, DUSK);
+  if (stage === 'room2') return setupDay(2, { x: 94.5, y: 18.5, dir: 'down' }, DUSK);
   // 3장: 2장을 다 본 상태
   Object.assign(flags, { roomAgain: false, foundNote: true, ch2Done: true, ch3: true });
   NOTE_CLUE.found = MEMO_CLUE.found = true;
@@ -2742,22 +2744,22 @@ function devStage(stage) {
   if (stage === 'ch3') return runScript('ch3Start');
   flags.suahClass = true;
   if (stage === 'suah') {
-    setupDay(1, { x: 57.5, y: 20.5, dir: 'down' });
-    addActor('suah', 57.5, 25.4, 'down', 1);
+    setupDay(1, { x: 56.5, y: 17.5, dir: 'up' });
+    addActor('suah', 56, 8.8, 'down', 1);
     return;
   }
   Object.assign(flags, { suahMet: true, shHall: true, shExam: true, suahMemDone: true });
   CONTRA_SH_THREAT.found = CONTRA_SH_WINDOW.found = true;
   route.evidence = 9;
   if (stage === 'guest') {
-    setupDay(1, { x: 74, y: 44.4, dir: 'up' });
-    addActor('suah', 57.5, 25.4, 'down', 1);
+    setupDay(1, { x: 93, y: 61.4, dir: 'up' });
+    addActor('suah', 56, 8.8, 'down', 1);
     return;
   }
   flags.gotGuestbook = GUEST_CLUE.found = true;
   if (stage === 'hand') {
-    setupDay(1, { x: 57.5, y: 20.5, dir: 'down' });
-    addActor('suah', 57.5, 25.4, 'down', 1);
+    setupDay(1, { x: 56.5, y: 17.5, dir: 'up' });
+    addActor('suah', 56, 8.8, 'down', 1);
     return;
   }
   Object.assign(flags, { suahWon: true, suahTestify: true, gyogamWon: true, thuEvening: true });
