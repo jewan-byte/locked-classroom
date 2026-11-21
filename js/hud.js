@@ -41,11 +41,11 @@ function drawPlayerDot(g, x, y, time) {
 
 const MINI = { w: 72, h: 54, scale: 2, margin: 6 };
 
-// 어두운 방 (잠긴 창고): 그 안에 있지 않으면 지도에서도 속을 가린다 (모양만 남긴다)
+// 어두운 방 (잠긴 창고): 그 안에 있지 않으면 지도에서도 어둡게 (형태만 희미하게)
 function hideDarkRooms(g, floor, ox, oy, s) {
   for (const r of floor.map.regions) {
     if (!r.dark || r === currentRegion) continue;
-    g.fillStyle = '#16141c';
+    g.fillStyle = 'rgba(16,14,22,0.72)';
     for (const [x, y, w, h] of r.dark) g.fillRect(ox + x * s, oy + y * s, w * s, h * s);
   }
 }

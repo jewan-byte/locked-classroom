@@ -731,7 +731,7 @@ function draw() {
   // 어두운 방 (잠긴 창고): 그 방 안에 있지 않으면 까맣게 가린다
   for (const r of floor.map.regions) {
     if (!r.dark || r === currentRegion) continue;
-    g.fillStyle = '#030308';   // 불투명하게 완전히 가린다 (위에 노을 색만 살짝 덧칠된다)
+    g.fillStyle = 'rgba(3,3,8,0.72)';   // 어둡게: 안의 형태만 희미하게 보이는 정도
     for (const [dx, dy, dw, dh] of r.dark) g.fillRect(dx * TILE - camX, dy * TILE - camY, dw * TILE, dh * TILE);
   }
   if (floor.map.night) {
