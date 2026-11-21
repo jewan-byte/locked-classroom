@@ -45,7 +45,7 @@ const MINI = { w: 72, h: 54, scale: 2, margin: 6 };
 function hideDarkRooms(g, floor, ox, oy, s) {
   for (const r of floor.map.regions) {
     if (!r.dark || r === currentRegion) continue;
-    g.fillStyle = 'rgba(16,14,22,0.9)';
+    g.fillStyle = 'rgba(16,14,22,0.96)';
     for (const [x, y, w, h] of r.dark) g.fillRect(ox + x * s, oy + y * s, w * s, h * s);
   }
 }
